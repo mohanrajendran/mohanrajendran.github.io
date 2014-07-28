@@ -11,4 +11,5 @@ tagline:          'Blog'
 description:      'Hi! I am Mohan Rajendran. A Software Engineer who happens to be an Aerospace Engineer is his previous lifetime. <br> I will be posting snippets from my personal projects and learnings in this blog.'
 url:              mohanrajendran.github.io
 
+excerpt_separator: <!--excerpt-->
 paginate:         5
