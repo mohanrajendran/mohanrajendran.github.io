@@ -122,3 +122,39 @@ The prefix form and evaluation in Scheme results in:-
 ; -37/150
 {% endhighlight %}
 
+### Exercise 1.3
+
+We are tasked with defining a procedure which takes in 3 arguments and returns the square of the 2 largest arguments. We solve this by building the solution step by step
+
+{% highlight scheme %}
+(define (sq x) (* x x))
+; sq
+ 
+(define (sumsq x y) (+ (sq x) (sq y)))
+; sumsq
+ 
+(define (largest2sq a b c)
+(cond ((and (<= a b) (<= a c)) (sumsq b c))
+((and (<= b a) (<= b c)) (sumsq a c))
+(else (sumsq a b))))
+; largest2sq
+ 
+; Test cases:-
+(largest2sq 1 2 3)
+; 13
+(largest2sq 1 3 2)
+; 13
+(largest2sq 1 1 2)
+; 5
+{% endhighlight %}
+
+### Exercise 1.4
+
+This exercise tasks us with explaining the behavior of the following procedure.
+
+{% highlight scheme %}
+(define (a-plus-abs-b a b)
+  ((if (> b 0) + -) a b))
+{% endhighlight %}
+
+When the if function is evaluated, based on the condition, the operator + or - is applied on the operands a and b. If b > 0, + operator is used, evaluating to $$a+b$$. Otherwise, - operator is issued which yields $$a-b$$. Ultimately, we evaluate to $$a+\|b\|$$.
