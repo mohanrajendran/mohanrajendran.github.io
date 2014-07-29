@@ -66,6 +66,10 @@ Evaluation order is an essential lesson to be learnt from this section. Simply s
 
 Both evaluation orders are studied in the exercises of this section.
 
+#### Imperative knowledge
+
+This section also emphasizes on the difference between *imperative* and *declarative* knowledge. Declarative knowledge is usually what math concerns with - the description of properties. Whereas, computer programs deal with imperative knowledge - procedure to obtain something. To demonstrate this, we write code to compute square root of a number as opposed to mathematical description which states $$\sqrt{x} = y$$ such that $$y >= 0$$ and $$y^2=x$$.
+
 ### Exercise 1.1
 
 This exercise deals with evaluating some Scheme functions and reporting their output. This acts as an introduction to Scheme syntax.
@@ -158,3 +162,49 @@ This exercise tasks us with explaining the behavior of the following procedure.
 {% endhighlight %}
 
 When the if function is evaluated, based on the condition, the operator + or - is applied on the operands a and b. If b > 0, + operator is used, evaluating to $$a+b$$. Otherwise, - operator is issued which yields $$a-b$$. Ultimately, we evaluate to $$a+\|b\|$$.
+
+### Exercise 1.5
+
+This exercise deals with examining how Lisp would behave in appilcative-order evaluation and normal order evaluation.
+
+{% highlight scheme %}
+(define (p) (p))
+
+(define (test x y)
+  (if (= x 0)
+      0
+      y))
+
+(test 0 (p))
+{% endhighlight %}
+
+When we evaluate the above expression, one of the following occurs based on the evaluation order.
+
+##### Applicative-order evaluation
+
+{% highlight scheme %}
+(test 0 (p))
+
+(test 0 (p))
+
+(test 0 (p))
+...
+{% endhighlight %}
+
+In *applicative-order evaluation*, the expression fails to terminate. This is because each formal parameter is replaced by its corresponding argument first(operator and operands are both expanded). Thus, the interpreter tries to evaluate (p) first which itself evaluates to (p) and so on. Thus, the evaulation does not terminate.
+
+##### Normal-order evaluation
+
+{% highlight scheme %}
+(test 0 (p))
+
+(if (= 0 0 ) 0 (p))
+
+(if #t 0 (p))
+
+0
+{% endhighlight %}
+
+In *normal-order evaluation*, the operand is not evaluated until it is required to do so. Thus, the interpreted evaluates the operator *test* first. Since the condition evaluates to #t for the resulting if operation, only the first argument is evaluated which is 0.
+
+Overall, MIT Scheme exhibits **applicative-order evaluation**. Thus, the evaluation never halts.
