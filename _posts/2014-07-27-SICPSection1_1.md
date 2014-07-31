@@ -1,7 +1,8 @@
 ---
 layout: post
-category: SICP
-title: SICP Section 1.1
+categories: [SICP, Summary]
+post_no: 1
+title: SICP Section 1.1 Summary
 ---
 
 # Elements of Programming

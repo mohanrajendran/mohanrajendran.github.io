@@ -13,5 +13,19 @@ To supplement the book, I will also be following the original online lectures by
 
 #### Contents
 
-- [Section 1.1 The Elements of Programming]({% post_url 2014-07-27-SICPSection1_1 %})
-- [Solutions to section 1.1 exercise]({% post_url 2014-07-28-SICPSolution1_1 %})
+
+<ul>
+	{% assign sicp_posts = site.categories.sicp | sort:"post_no" %}
+	{% for post in sicp_posts %}
+		<li>
+			<a href="{{ post.url }}">{{ post.title }}</a>
+			{% if post.submenu %}
+			<ul>
+			{% for item in post.submenu %}
+				<li> <a href="{{ post.url }}#{{ item.hook }}">{{ item.title }} </a> </li>
+			{% endfor %}
+			</ul>
+			{% endif %}
+		</li>
+	{% endfor %}
+</ul>

@@ -1,10 +1,20 @@
 ---
 layout: post
-category: SICP
-title: Solutions for SICP Section 1.1 exercises
+categories: [SICP, Solutions]
+post_no: 2
+title: SICP Section 1.1 Exercise Solutions
+submenu:
+  - { hook: "Exercise1_1", title: "Exercise 1.1" }
+  - { hook: "Exercise1_2", title: "Exercise 1.2" }
+  - { hook: "Exercise1_3", title: "Exercise 1.3" }
+  - { hook: "Exercise1_4", title: "Exercise 1.4" }
+  - { hook: "Exercise1_5", title: "Exercise 1.5" }
+  - { hook: "Exercise1_6", title: "Exercise 1.6" }
+  - { hook: "Exercise1_7", title: "Exercise 1.7" }
+  - { hook: "Exercise1_8", title: "Exercise 1.8" }
 ---
 
-### Exercise 1.1
+### Exercise 1.1<a name="Exercise1_1">&nbsp;</a>
 
 This exercise deals with evaluating some Scheme functions and reporting their output. This acts as an introduction to Scheme syntax.
 
@@ -46,7 +56,7 @@ This exercise deals with evaluating some Scheme functions and reporting their ou
 ; 16
 {% endhighlight %}
 
-### Exercise 1.2
+### Exercise 1.2<a name="Exercise1_2">&nbsp;</a>
 
 This exercise deals with the translation of an equation into the prefix form. The equation and expected answer are as follows:-
 
@@ -60,7 +70,7 @@ The prefix form and evaluation in Scheme results in:-
 ; -37/150
 {% endhighlight %}
 
-### Exercise 1.3
+### Exercise 1.3<a name="Exercise1_3">&nbsp;</a>
 
 We are tasked with defining a procedure which takes in 3 arguments and returns the square of the 2 largest arguments. We solve this by building the solution step by step
 
@@ -86,7 +96,7 @@ We are tasked with defining a procedure which takes in 3 arguments and returns t
 ; 5
 {% endhighlight %}
 
-### Exercise 1.4
+### Exercise 1.4<a name="Exercise1_4">&nbsp;</a>
 
 This exercise tasks us with explaining the behavior of the following procedure.
 
@@ -97,7 +107,7 @@ This exercise tasks us with explaining the behavior of the following procedure.
 
 When the if function is evaluated, based on the condition, the operator + or - is applied on the operands a and b. If b > 0, + operator is used, evaluating to $$a+b$$. Otherwise, - operator is issued which yields $$a-b$$. Ultimately, we evaluate to $$a+\|b\|$$.
 
-### Exercise 1.5
+### Exercise 1.5<a name="Exercise1_5">&nbsp;</a>
 
 This exercise deals with examining how Lisp would behave in appilcative-order evaluation and normal order evaluation.
 
@@ -143,7 +153,7 @@ In *normal-order evaluation*, the operand is not evaluated until it is required 
 
 Overall, MIT Scheme exhibits **applicative-order evaluation**. Thus, the evaluation never halts.
 
-### Exercise 1.6
+### Exercise 1.6<a name="Exercise1_6">&nbsp;</a>
 
 This exercise deals again with the pitfall of not considering evaluation order while writing our code. For that purpose, we consider a case when the `if` function is rewritten using `cond` and running our square root finding algorithm.
 
@@ -198,7 +208,7 @@ Note:- `cond` is not expanded to for clarity.
 
 Thus, in this case. The predicate, then-clause and else-clause are all evaluated first. Thus, irrespective of the condition, both clauses are evaluated. Because the else-clause contains another new-if statement, this means that the evaluation continues recursively down ad infinitum even if a terminal case is reached. Thus the evauation does not terminate.
 
-### Exercise 1.7
+### Exercise 1.7<a name="Exercise1_7">&nbsp;</a>
 
 This exercise is used to teach us the short-coming of machine precision computation which can affect our computations even though the procedure is specified in a sound manner. We take a look at the square root function in this section.
 
@@ -259,7 +269,7 @@ The `good-enough?` function above evaluates by only comparing the previous-guess
 ; 31622776.601683795
 {% endhighlight %}
 
-### Exercise 1.8
+### Exercise 1.8<a name="Exercise1_8">&nbsp;</a>
 
 This exercise tasks us to use what we learnt in this section to write our own cube root function. In addition to that, we utilize the refinements we made in the previous exercise.
 
