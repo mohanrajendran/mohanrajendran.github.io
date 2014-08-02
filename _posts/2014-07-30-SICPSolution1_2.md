@@ -7,6 +7,7 @@ submenu:
   - { hook: "Exercise1_9", title: "Exercise 1.9" }
   - { hook: "Exercise1_10", title: "Exercise 1.10" }
   - { hook: "Exercise1_11", title: "Exercise 1.11" }
+  - { hook: "Exercise1_12", title: "Exercise 1.12" }
 ---
 
 ### Exercise 1.9<a name="Exercise1_9">&nbsp;</a>
@@ -276,4 +277,80 @@ $$ p(r,c) = \begin{cases} 1 & c=0|c=r\\ p(r-1,c) + p(r-1,c-1) & otherwise \end{c
 ; 126
 {% endhighlight %}
 
+### Exercise 1.13<a name="Exercise1_13">&nbsp;</a>
 
+This exercise wants us to prove that $$Fib(n)$$ is the closest integer to $$\phi^n/\sqrt{5}$$ where $$\phi=(1+\sqrt{5})/2$$. Let us derive this using the hints given.
+
+Firstly, we are told to prove that
+
+$$Fib(n)=(\phi^n-\psi^n)/\sqrt{5}$$
+
+where $$\psi=(1-\sqrt{5})/2$$. We are also given that $$\phi^2=\phi+1$$ and $$\psi^2=\psi+1$$.
+
+Let us use mathematical induction to prove the relation.
+
+#### Base case
+
+Left-hand side:-
+
+$$\begin{align}Fib(0) &= 0 \\ Fib(1) &= 1 \\ Fib(2) &= Fib(0)+Fib(1)=1\end{align}$$
+
+Right-hand side:-
+
+*n = 0*
+
+$$\begin{align}(\phi^n-\psi^n)/\sqrt{5} &= (\phi^0-\psi^0)/\sqrt{5} \\ &= (1-1)/\sqrt{5}
+\\ &= 0/\sqrt{5}
+\\ &= 0\end{align}$$
+
+*n = 1*
+
+$$\begin{align}(\phi^n-\psi^n)/\sqrt{5} &= (\phi^1-\psi^1)/\sqrt{5} \\ &= ((1+\sqrt{5})/2-(1-\sqrt{5})/2)/\sqrt{5}
+\\ &= ((2\sqrt{5})/2)/\sqrt{5}
+\\ &= \sqrt{5}/\sqrt{5}
+\\ &= 1\end{align}$$
+
+*n = 2*
+
+$$\begin{align}(\phi^n-\psi^n)/\sqrt{5} &= (\phi^2-\psi^2)/\sqrt{5} \\ &= ((\phi+1)-(\psi+1))/\sqrt{5}
+\\ &= (\phi-\psi)/\sqrt{5}
+\\ &= 1\end{align}$$
+
+#### Inductive step
+
+Let us assume that the following relations hold true,
+
+$$\begin{align} Fib(n) &= (\phi^n-\psi^n)/\sqrt{5} \\ Fib(n-1) &= (\phi^{n-1}-\psi^{n-1})/\sqrt{5}\end{align}$$
+
+We need to prove that the assumptions lead to
+
+$$Fib(n+1) = (\phi^{n+1}-\psi^{n+1})/\sqrt{5}$$
+
+From definition,
+
+$$\begin{align}Fib(n+1) &= Fib(n)+Fib(n-1)
+\\ &= (\phi^n-\psi^n)/\sqrt{5} + (\phi^{n-1}-\psi^{n-1})/\sqrt{5}
+\\ &= (\phi^n+\phi^{n-1})/\sqrt{5} - (\psi^n+\psi^{n-1})/\sqrt{5}
+\\ &= (\phi^{n-1}(\phi+1))/\sqrt{5} - (\psi^{n-1}(\psi+1))/\sqrt{5}
+\\ &= (\phi^{n-1}\phi^2)/\sqrt{5} - (\psi^{n-1}\psi^2)/\sqrt{5}
+\\ &= (\phi^{n+1}-\psi^{n+1})/\sqrt{5} \end{align}$$
+
+Hence, we have proven the relation.
+
+#### Original problem
+
+Going back to the original problem, we can reformulate it to say that we need to prove $$\|Fib(n) - \phi^n/\sqrt{5}\| <= 1/2$$.
+
+From the inductive proof above, we can see that $$Fib(n)-\phi^n/\sqrt{5} = \psi^n/\sqrt{5}$$.
+
+Thus, we need to prove $$\|\phi^n/\sqrt{5}\| <= 1/2$$ or $$\|\phi^n\| <= \sqrt{5}/2$$.
+
+We have $$\phi = (1-\sqrt{5})/2 \approx -0.618034$$ and $$\sqrt{5}/2 \approx 1.118034$$.
+
+Since $$\|\phi\|<1$$, we have $$\|\phi^n\|<1$$ where n is any positive integer in $$Fib(n)$$.
+
+We can safely say that
+
+$$\|Fib(n) - \phi^n/\sqrt{5}\| <= 1/2$$
+
+Thus, *Fib(n) is the closest integer to* $$\phi^n/\sqrt{5}$$.
