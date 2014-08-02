@@ -247,3 +247,33 @@ Once the transformations are applied *n* number of times, *c* would evaluate to 
 {% endhighlight %}
 
 The iterative process is more powerful since it can take significantly smaller time in the order of $$O(n)$$ to compute the result as opposed to the recursive process which takes $$O(f(n))$$ time to compute.
+
+### Exercise 1.12<a name="Exercise1_12">&nbsp;</a>
+
+This exercise makes us write a procedure which evaluates the elements in a [Pascal's triangle](http://en.wikipedia.org/wiki/Pascal%27s_triangle) using a recursive process. We use the coordinate system below.
+
+<center><img src="/images/PascalTriangle.gif" alt="Pascal Triangle" /></center>
+
+We can define the pascal function at any row and column as such:-
+
+$$ p(r,c) = \begin{cases} 1 & c=0|c=r\\ p(r-1,c) + p(r-1,c-1) & otherwise \end{cases} $$
+
+{% highlight scheme %}
+(define (pascal row col)
+(if (or (= col 0) (= col row)) 1
+    (+ (pascal (- row 1) col)
+       (pascal (- row 1) (- col 1)))))
+; pascal
+
+; Test cases:-
+(pascal 0 0)
+; 1
+(pascal 100 100)
+; 1
+(pascal 13 6)
+; 1716
+(pascal 9 4)
+; 126
+{% endhighlight %}
+
+
