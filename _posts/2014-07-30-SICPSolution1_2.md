@@ -2,7 +2,7 @@
 layout: post
 category: [SICP, Solutions]
 post_no: 4
-title: SICP Section 1.2 Exercise Solutions
+title: "SICP Section 1.2 Exercise Solutions - Part 1"
 submenu:
   - { hook: "Exercise1_9", title: "Exercise 1.9" }
   - { hook: "Exercise1_10", title: "Exercise 1.10" }
@@ -11,6 +11,10 @@ submenu:
   - { hook: "Exercise1_13", title: "Exercise 1.13" }
   - { hook: "Exercise1_14", title: "Exercise 1.14" }
   - { hook: "Exercise1_15", title: "Exercise 1.15" }
+  - { hook: "Exercise1_16", title: "Exercise 1.16" }
+  - { hook: "Exercise1_17", title: "Exercise 1.17" }
+  - { hook: "Exercise1_18", title: "Exercise 1.18" }
+  - { hook: "Exercise1_19", title: "Exercise 1.19" }
 ---
 
 ### Exercise 1.9<a name="Exercise1_9">&nbsp;</a>
@@ -461,3 +465,192 @@ From the above, we can see that the procedure `p` is applied 5 times.
 The time and space complexity should have the same order in this case because we do not see any branches in the evaluation tree.
 
 As we can see, the number of steps taken by the evaluation of `(sine a)` increases by one when `a` is tripled. This hints at a logarithmic growth of $$O(log n)$$ for both time and space complexity.
+
+### Exercise 1.16<a name="Exercise1_16">&nbsp;</a>
+
+This exercise tasks us with writing the given fast-exponentiation function with a procedure utilizing iterative process. It also introduces the concept of a loop invariant. In this case, we use a accummulator variable *a* which starts at 1 and evaluates to $$b^n$$ at the end of the iteration. Similar to the rule provided for odd and even powers, we make a new rule such that $$ab^n$$ does not vary between successive iterations.
+
+$$ ab^n = \begin{cases} (ab)b^{n-1} & \text{if n is odd} \\ a(b^2)^{n/2} & \text{if n is even} \end{cases} $$
+
+We write the procedure in scheme.
+
+{% highlight scheme %}
+(define (fast-expt b n)
+  (fast-expt-iter b n 1))
+; fast-expt
+
+(define (fast-expt-iter b n a)
+  (cond ((= n 0) a)
+        ((even? n)
+         (fast-expt-iter (square b) (/ n 2) a))
+        (else
+         (fast-expt-iter b (- n 1) (* a b)))))
+; fast-expt-iter
+
+(define (even? n)
+  (= (remainder n 2) 0))
+; remainder
+
+; Test cases:-
+(fast-expt 2 2)
+; 4
+(fast-expt 5 5)
+; 3215
+(fast-expt 1.5 10)
+; 57.6650390625
+{% endhighlight %}
+
+### Exercise 1.17<a name="Exercise1_17">&nbsp;</a>
+
+This exercise tasks us with writing fast integer multiplication using a method similar to fast exponentiation presented in this section.
+
+$$ ab = \begin{cases} a + a(b-1) & \text{if n is odd} \\ 2a(b/2) & \text{if n is even} \end{cases} $$
+
+Writing new helper functions *halve* and *double*, we have
+
+{% highlight scheme %}
+(define (fast-mult a b)
+  (cond ((= b 0) 0)
+        ((= b 1) a)
+        ((even? b) 
+         (double (fast-mult a (halve b))))
+        (else 
+         (+ a (fast-mult a (- b 1))))))
+; fast-mult
+
+(define (even? n)
+  (= (remainder n 2) 0))
+; even?
+
+(define (double n)
+  (* n 2))
+; double
+
+(define (halve n)
+  (/ n 2))
+; halve
+
+; Test cases:-
+(fast-mult 5 1)
+; 5
+(fast-mult 113 135)
+; 15255
+(fast-mult 23 76)
+; 1748
+{% endhighlight %}
+
+### Exercise 1.18<a name="Exercise1_18">&nbsp;</a>
+
+In this exercise, we extend the solutions from the previous two exercises to create an iterative process for computing the multiplication of two numbers. In this case, we use an accummulator variable *p* to hold the intermediate product. We get an invariant of $$p + ab$$.
+
+$$ p + ab = \begin{cases} (p+a)+a(b-1) & \text{if n is odd} \\ p+(2a)(b/2) & \text{if n is even} \end{cases} $$
+
+{% highlight scheme %}
+(define (fast-mult a b)
+  (fast-mult-iter a b 0))
+; fast-mult
+
+(define (fast-mult-iter a b p)
+  (cond ((= b 0) p)
+        ((even? b)
+         (fast-mult-iter (double a) (halve b) a))
+        (else
+         (fast-mult-iter a (- b 1) (+ p b)))))
+; fast-mult-iter
+
+(define (fast-mult a b)
+  (cond ((= b 0) 0)
+        ((= b 1) a)
+        ((even? b) 
+         (double (fast-mult a (halve b))))
+        (else 
+         (+ a (fast-mult a (- b 1))))))
+; fast-mult
+
+(define (even? n)
+  (= (remainder n 2) 0))
+; even?
+
+(define (double n)
+  (* n 2))
+; double
+
+(define (halve n)
+  (/ n 2))
+; halve
+
+; Test cases:-
+(fast-mult 5 1)
+; 5
+(fast-mult 113 135)
+; 15255
+(fast-mult 23 76)
+; 1748
+{% endhighlight %}
+
+### Exercise 1.19<a name="Exercise1_19">&nbsp;</a>
+
+In this interesting exercise, we are told to extend the $$O(log(n))$$ solutions developed in the previous exercises to the computation of the Fibonacci series. To help with that, we develop a generic transformation $$T_{pq}$$,
+
+$$\begin{align}a &\leftarrow (p+q)a + qb \\ b &\leftarrow qa + pb\end{align}$$
+
+wherein, $$T_{01}$$ is the special case denoting one step of transformation in generating Fibonacci series. To accelerate this process, let us apply $$T_{pq}$$ twice to obtain a compact transformation $$T_{p'q'}$$ that does two steps in one step.
+
+$$\begin{align}a_1 &\leftarrow (p+q)a + qb
+\\ b_1 &\leftarrow qa + p
+\\ a_2 &\leftarrow (p+q)a_1 + qb_1
+\\ &\leftarrow (p+q)[(p+q)a+qb]+q(qa+pb)
+\\ &\leftarrow (p^2+2pq+q^2)a+(pq+q^2)b+(q^2)a+(pq)b
+\\ &\leftarrow (p^2+2pq+2q^2)a+(2pq+p^2)b
+\\ b_2 &\leftarrow qa_1 + pb_1
+\\ &\leftarrow q[(p+q)a+qb]+p(qa+pb)
+\\ &\leftarrow (pq+q^2)a+(q^2)b+(pq)a+(p^2)b
+\\ &\leftarrow (q^2+2pq)a+(p^2+q^2)b\end{align}$$
+
+Ultimately, we obtain $$p'=p^2+q^2$$ and $$q'=q^2+2pq$$.
+
+Substituting it into the provided function template, we get the following code which computes $$Fib(n)$$ in $$O(log(n))$$ time.
+
+{% highlight scheme %}
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+  (cond ((= count 0) 
+         b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (+ (square p) (square q))  ;compute p'
+                   (+ (square q) (* 2 p q))   ;compute q'
+                   (/ count 2)))
+        (else 
+         (fib-iter (+ (* b q) 
+                      (* a q) 
+                      (* a p))
+                   (+ (* b p) 
+                      (* a q))
+                   p
+                   q
+                   (- count 1)))))
+
+; Test cases:-
+(fib 0)
+; 0
+(fib 1)
+; 1
+(fib 2)
+; 1
+(fib 3)
+; 2
+(fib 4)
+; 3
+(fib 10)
+; 55
+(fib 100)
+; 354224848179261915075
+{% endhighlight %}
+
+
+
+

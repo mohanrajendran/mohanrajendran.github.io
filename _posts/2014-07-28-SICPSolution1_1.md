@@ -83,8 +83,8 @@ We are tasked with defining a procedure which takes in 3 arguments and returns t
  
 (define (largest2sq a b c)
 (cond ((and (<= a b) (<= a c)) (sumsq b c))
-((and (<= b a) (<= b c)) (sumsq a c))
-(else (sumsq a b))))
+      ((and (<= b a) (<= b c)) (sumsq a c))
+      (else (sumsq a b))))
 ; largest2sq
  
 ; Test cases:-
