@@ -264,7 +264,7 @@ This exercise makes us write a procedure which evaluates the elements in a [Pasc
 
 We can define the pascal function at any row and column as such:-
 
-$$ p(r,c) = \begin{cases} 1 & c=0|c=r\\ p(r-1,c) + p(r-1,c-1) & otherwise \end{cases} $$
+$$ p(r,c) = \begin{cases} 1 & \text{c=0 or c=r}\\ p(r-1,c) + p(r-1,c-1) & otherwise \end{cases} $$
 
 {% highlight scheme %}
 (define (pascal row col)
