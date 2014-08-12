@@ -504,7 +504,7 @@ We write the procedure in scheme.
 
 This exercise tasks us with writing fast integer multiplication using a method similar to fast exponentiation presented in this section.
 
-$$ ab = \begin{cases} a + a(b-1) & \text{if n is odd} \\ 2a(b/2) & \text{if n is even} \end{cases} $$
+$$ ab = \begin{cases} a + a(b-1) & \text{if b is odd} \\ 2a(b/2) & \text{if b is even} \end{cases} $$
 
 Writing new helper functions *halve* and *double*, we have
 
@@ -543,7 +543,7 @@ Writing new helper functions *halve* and *double*, we have
 
 In this exercise, we extend the solutions from the previous two exercises to create an iterative process for computing the multiplication of two numbers. In this case, we use an accummulator variable *p* to hold the intermediate product. We get an invariant of $$p + ab$$.
 
-$$ p + ab = \begin{cases} (p+a)+a(b-1) & \text{if n is odd} \\ p+(2a)(b/2) & \text{if n is even} \end{cases} $$
+$$ p + ab = \begin{cases} (p+a)+a(b-1) & \text{if b is odd} \\ p+(2a)(b/2) & \text{if b is even} \end{cases} $$
 
 {% highlight scheme %}
 (define (fast-mult a b)
