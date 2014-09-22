@@ -221,18 +221,24 @@ In this exercise, we try to measure the time taken for the `prime?` function to 
 {% highlight scheme %}
 (define (prime? n)
   (= n (smallest-divisor n)))
+; prime?
 
 (define (timed-prime-test n)
   (newline)
   (display n)
   (start-prime-test n (runtime)))
+; timed-prime-test
+
 (define (start-prime-test n start-time)
   (if (prime? n)
       (report-prime (- (runtime) 
                        start-time))))
+; start-prime-test
+
 (define (report-prime elapsed-time)
   (display " *** ")
   (display elapsed-time))
+; report-prime
 {% endhighlight %}
 
 We now write a function that gives the primes in a range. And prints out the time taken to test a number.
@@ -351,3 +357,73 @@ Once again, we take the median time value and compute the ratio
 
 As we can see, instead of the expected ratio of 2, we instead get an ratio of 1.73. This is probably because of the extra overhead incurred with replacing a simple `(+ test-divisor 1)` with a more complex `next` which involves evaluating an `if` statement. This extra overhead prevents us from reaching a ratio of 2.
 
+### Exercise 1.24<a name="Exercise1_24">&nbsp;</a>
+
+In this exercise, we are tasked to compute the time complexity of the `fast-prime?` function similar to the previous exercises. For that purpose, the following timing code is used:-
+{% highlight scheme %}
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder 
+          (square (expmod base (/ exp 2) m))
+          m))
+        (else
+         (remainder 
+          (* base (expmod base (- exp 1) m))
+          m))))
+; expmod
+
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))
+; fermat-test
+
+(define (fast-prime? n times)
+  (cond ((= times 0) true)
+        ((fermat-test n) 
+         (fast-prime? n (- times 1)))
+        (else false)))
+; fast-prime?
+  
+(define (prime? n) 
+  (fast-prime? n 10000))
+; prime?
+
+(define (timed-prime-test n)
+  (start-prime-test n (runtime)))
+; timed-prime-test
+
+(define (start-prime-test n start-time)
+  (if (prime? n) 
+      (report-prime n (- (runtime) start-time))))
+; start-prime-test
+  
+(define (report-prime n elapsed-time) 
+  (newline) 
+  (display n) 
+  (display " *** ") 
+  (display elapsed-time))
+; report-prime
+{% endhighlight %}
+
+For our exercise, 10000 trials were used for testing. The following times were observed.
+
+{% highlight scheme %}
+(timed-prime-test 1009)
+; 1009 *** .3400000000000034
+(timed-prime-test 1000003)
+; 1000003 *** .6500000000000125
+
+(timed-prime-test 10007)
+; 10007 *** .4399999999999977
+(timed-prime-test 100000007)
+; 10000019 *** .8199999999999795
+
+(timed-prime-test 100003)
+; 100003 *** .5099999999999909
+(timed-prime-test 1000000000039)
+; 1000000000039 *** 1.329999999999984
+{% endhighlight %}
+
+As can be seen, when the digits are doubled, ie. the number is squared, the time taken for the procedure to complete is approximately doubled. Thus, the time complexity of the `fast-prime?` function is $O(log n)$.
