@@ -347,7 +347,7 @@ Once again, we take the median time value and compute the ratio
 ; 1.7323232323232325
 (/ 10.92 6.29)
 ; 1.7360890302066772
-{% endhighligt %}
+{% endhighlight %}
 
 As we can see, instead of the expected ratio of 2, we instead get an ratio of 1.73. This is probably because of the extra overhead incurred with replacing a simple `(+ test-divisor 1)` with a more complex `next` which involves evaluating an `if` statement. This extra overhead prevents us from reaching a ratio of 2.
 
