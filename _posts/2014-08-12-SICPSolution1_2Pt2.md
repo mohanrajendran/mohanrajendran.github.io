@@ -5,6 +5,14 @@ post_no: 5
 title: "SICP Section 1.2 Exercise Solutions - Part 2"
 submenu:
   - { hook: "Exercise1_20", title: "Exercise 1.20" }
+  - { hook: "Exercise1_21", title: "Exercise 1.21" }
+  - { hook: "Exercise1_22", title: "Exercise 1.22" }
+  - { hook: "Exercise1_23", title: "Exercise 1.23" }
+  - { hook: "Exercise1_24", title: "Exercise 1.24" }
+  - { hook: "Exercise1_25", title: "Exercise 1.25" }
+  - { hook: "Exercise1_26", title: "Exercise 1.26" }
+  - { hook: "Exercise1_27", title: "Exercise 1.27" }
+  - { hook: "Exercise1_28", title: "Exercise 1.28" }
 ---
 
 ### Exercise 1.20<a name="Exercise1_20">&nbsp;</a>
@@ -294,7 +302,7 @@ We take the median value of the three results for each query and compare the rat
 ; 3.183673469387755
 {% endhighlight %}
 
-The ratio of time taken when input is multiplied by 10 is given to be approximately equal to $\sqrt{10} = 3.16227$. Thus, we can say that the algorithm has a time complexity of $O(\sqrt{n})$.
+The ratio of time taken when input is multiplied by 10 is given to be approximately equal to $$\sqrt{10} = 3.16227$$. Thus, we can say that the algorithm has a time complexity of $$O(\sqrt{n})$$.
 
 ### Exercise 1.23<a name="Exercise1_23">&nbsp;</a>
 
@@ -426,4 +434,162 @@ For our exercise, 10000 trials were used for testing. The following times were o
 ; 1000000000039 *** 1.329999999999984
 {% endhighlight %}
 
-As can be seen, when the digits are doubled, ie. the number is squared, the time taken for the procedure to complete is approximately doubled. Thus, the time complexity of the `fast-prime?` function is $O(log n)$.
+As can be seen, when the digits are doubled, ie. the number is squared, the time taken for the procedure to complete is approximately doubled. Thus, the time complexity of the `fast-prime?` function is $$O(\log n)$$.
+
+### Exercise 1.25<a name="Exercise1_25">&nbsp;</a>
+
+In this exercise, we are tasked with trying to understand why we should not compute exponentials directly for this particular problem.
+
+When we compute `(fast-expt base exp)` directly, we have to deal with very large numbers when the argument `exp` is large. The numbers may sometimes be larger than what can be stored in a regular integer. In these cases the computation may take a long while to complete.
+
+Thus, we use the modular arithmetic formula $$(a \mod n)(b \mod n) \equiv ab \pmod{n}$$ to compute the final value without dealing with the large values.
+
+This idea is also mentioned in the [footnote 46](http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-11.html#footnote_Temp_78) of the book.
+
+### Exercise 1.26<a name="Exercise1_26">&nbsp;</a>
+
+We are asked to explain why the following `expmod` function by Louis Reasoner is slow.
+
+{% highlight scheme %}
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder 
+          (* (expmod base (/ exp 2) m)
+             (expmod base (/ exp 2) m))
+          m))
+        (else
+         (remainder 
+          (* base 
+             (expmod base (- exp 1) m))
+          m))))
+{% endhighlight %}
+
+As can be seen, the only modification is replacing `(square (expmod base (/ exp 2) m))` with `(* (expmod base (/ exp 2) m) (expmod base (/ exp 2) m))`. This means that when evaluating the second statement, `(expmod base (/ exp 2) m)` is evaluated twice since they are written twice.
+
+Performing a simple time complexity analysis, we can see that for the original case, time taken for computing $$b^{e}$$ is simply the time taken for computing $$b^{e/2}$$ plus some constant, leading to a time complexity of $$O(\log n)$$. Whereas, for the new code, time taken to compute $$b^{e}$$ is twice that of time taken for computing $$b^{e/2}$$. This leads to a branching execution similar to the original Fibonacci example. The new process takes $$O(n)$$ time.
+
+### Exercise 1.27<a name="Exercise1_27">&nbsp;</a>
+
+This exercise tasks us with verifying that Carmichael numbers fool the Fermat test. For that purpose, we write a function that takes an integer n and tests whether $$a^{n} \equiv a \pmod{n}$$ for all $$a<n$$.
+
+{% highlight scheme %}
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder 
+          (square (expmod base (/ exp 2) m))
+          m))
+        (else
+         (remainder 
+          (* base (expmod base (- exp 1) m))
+          m))))
+; expmod
+
+(define (exp-mod-equals? a n)
+  (= (expmod a n n) a))
+; exp-mod-equals?
+
+(define (try-fermat n a)
+  (cond ((= n a) true)
+        ((exp-mod-equals? n a) (try-fermat n (+ a 1)))
+        (else false)))
+; try-fermat
+
+(define (full-fermat-test n)
+  (try-fermat n 1))
+; full-fermat-test
+{% endhighlight %}
+
+Trying it on the given Carmichael numbers, we get
+
+{% highlight scheme %}
+(full-fermat-test 561)
+; #t
+(full-fermat-test 1105)
+; #t
+(full-fermat-test 1729)
+; #t
+(full-fermat-test 2465)
+; #t
+(full-fermat-test 2821)
+; #t
+(full-fermat-test 6601)
+; #t
+{% endhighlight %}
+
+Thus, we can see that Carmichael numbers fool the Fermat test.
+
+### Exercise 1.28<a name="Exercise1_28">&nbsp;</a>
+
+In this exercise, we implement a modified form of Fermat test names Miller-Rabin test that cannot be fooled by Carmichael numbers. Basically, we check $$a^{n-1} \equiv 1 \pmod{n}$$ for $$a<n$$ albeit with some checks in the middle. For that purpose, we modify the existing Fermat test.
+
+{% highlight scheme %}
+(define (trivial-square s n)
+  (define sqmod (remainder (* s s) n))
+  (if (and (not (or (= s 1) (= s (- n 1))))
+           (= sqmod 1))
+      0
+      sqmod))
+; trivial-square
+
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+		   (trivial-square (expmod base (/ exp 2) m) m))
+        (else
+         (remainder 
+          (* base (expmod base (- exp 1) m))
+          m))))
+; expmod
+
+(define (miller-rabin-test n)
+  (define (try-it a)
+    (= (expmod a (- n 1) n) 1))
+  (try-it (+ 1 (random (- n 1)))))
+; miller-rabin-test
+
+(define (fast-prime? n times)
+  (cond ((= times 0) true)
+        ((miller-rabin-test n) 
+         (fast-prime? n (- times 1)))
+        (else false)))
+; fast-prime?
+{% endhighlight %}
+
+Running this code on some random prime and non-prime numbers, we get the following:-
+
+{% highlight scheme %}
+(fast-prime? 5849 1000)
+; #t
+(fast-prime? 92153 1000)
+; #t
+(fast-prime? 19963 1000)
+; #t
+
+(fast-prime? 39984 1000)
+; #f
+(fast-prime? 83507 1000)
+; #f
+(fast-prime? 62495 1000)
+; #f
+{% endhighlight %}
+
+Verifying that this test still works, when we try Carmichael numbers, we get the following:-
+
+{% highlight scheme %}
+(fast-prime? 561 1000)
+; #f
+(fast-prime? 1105 1000)
+; #f
+(fast-prime? 1729 1000)
+; #f
+(fast-prime? 2465 1000)
+; #f
+(fast-prime? 2821 1000)
+; #f
+(fast-prime? 6601 1000)
+; #f
+{% endhighlight %}
+
+Thus, the Miller-Rabin test can be used to test Carmichael numbers too.
