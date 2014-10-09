@@ -8,6 +8,7 @@ submenu:
   - { hook: "Exercise1_30", title: "Exercise 1.30" }
   - { hook: "Exercise1_31", title: "Exercise 1.31" }
   - { hook: "Exercise1_32", title: "Exercise 1.32" }
+  - { hook: "Exercise1_33", title: "Exercise 1.33" }
 ---
 
 ### Exercise 1.29<a name="Exercise1_29">&nbsp;</a>
@@ -223,4 +224,100 @@ Then, `product` and `sum` can be defined as follows:-
 (define (product term a next b)
   (accumulate * 1 term a next b))
 ; product
+{% endhighlight %}
+
+##### Iterative procedure
+
+The iterative procedure is also simple. It is as follows:-
+
+{% highlight scheme %}
+(define (accumulate combiner null-value term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (combiner result (term a)))))
+  (iter a null-value))
+{% endhighlight %}
+
+Same answers are obtained when the procedures are evaluated using the functions from previous exercises.
+
+### Exercise 1.33<a name="Exercise1_33">&nbsp;</a>
+
+In this section we are tasked with creating a version of `accumulate` called `filtered-accumulate` that only accumulates values satisfying a single argument predicate named `filter`.
+
+{% highlight scheme %}
+(define (filtered-accumulate filter combiner null-value term a next b)
+  (if (> a b)
+      null-value
+	  (if (filter a)
+          (combiner (term a)
+                    (filtered-accumulate filter combiner null-value term (next a) next b))
+          (filtered-accumulate filter combiner null-value term (next a) next b))))
+{% endhighlight %}
+
+##### Sum of squares of prime numbers
+
+Using the `fast-prime?` from the previous section, we can create a function that sums the squares of prime numbers from a given range.
+
+{% highlight scheme %}
+(define (fast-prime? n)
+   (define (smallest-divisor n)
+      (define (find-divisor n test-divisor)
+         (define (next x)
+            (if (= x 2) 3 (+ x 2)))
+         (define (divides? a b)
+            (= (remainder b a) 0))
+         (cond ((> (square test-divisor) n) n)
+               ((divides? test-divisor n) test-divisor)
+               (else (find-divisor n (next test-divisor)))))
+      (find-divisor n 2))
+   (= n (smallest-divisor n)))
+; fast-prime?
+
+(define (sum-of-squared-primes a b)
+  (define (inc x) (+ x 1))
+  (define (square x) (* x x))
+  (filtered-accumulate fast-prime? + 0 square a inc b))
+; sum-of-squared-primes
+{% endhighlight %}
+
+To validate this, we can look at the first few primes 2, 3, 5, 7, 11 and 13.
+
+{% highlight scheme %}
+(sum-squared-primes 2 3) ;4+9
+; 13
+(sum-squared-primes 2 6) ;4+9+25
+; 38
+(sum-squared-primes 6 10) ;49
+; 49
+(sum-squared-primes 6 13) ;49+121+169
+; 339
+{% endhighlight %}
+
+##### Product of coprimes
+
+The product of coprimes of n can be computed as follows:-
+
+{% highlight scheme %}
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+; gcd
+
+(define (product-of-coprimes n)
+  (define (inc x) (+ x 1))
+  (define (id x) x)
+  (define (coprime? i) (= (gcd i n) 1))
+  (filtered-accumulate coprime? * 1 id 1 inc (- n 1)))
+; product-of-coprimes
+{% endhighlight %}
+
+To test it, let us check for the coprimes of number 13. Since 13 is a prime, the answer should be $$12!$$.
+
+{% highlight scheme %}
+(product-of-coprimes 13)
+; 479001600
+(factorial 12)
+; 479001600
 {% endhighlight %}
