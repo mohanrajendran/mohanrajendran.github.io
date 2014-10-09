@@ -26,6 +26,8 @@ In this exercise, we revisit the applicative and normal-order evaluation strateg
       (gcd b (remainder a b))))
 {% endhighlight %}
 
+<!--excerpt-->
+
 #### Normal-order evaluation
 
 In normal-order evaluation, we fully expand first before evaluating.
