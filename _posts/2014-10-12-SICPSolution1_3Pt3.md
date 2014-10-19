@@ -10,6 +10,7 @@ submenu:
   - { hook: "Exercise1_43", title: "Exercise 1.43" }
   - { hook: "Exercise1_44", title: "Exercise 1.44" }
   - { hook: "Exercise1_45", title: "Exercise 1.45" }
+  - { hook: "Exercise1_46", title: "Exercise 1.46" }
 ---
 
 ### Exercise 1.40<a name="Exercise1_40">&nbsp;</a>
@@ -42,7 +43,15 @@ Now, when we perform the following procedure,
 {% highlight scheme %}
 (((double (double double)) inc) 5)
 
-(((double double double double) inc) 5)
+(((lambda (x) ((double double) ((double double) x))) inc) 5)
+
+(((double double) ((double double) inc)) 5)
+
+(((double double) (double (double inc))) 5)
+
+...
+
+((double (double (double (double inc)))) 5)
 {% endhighlight %}
 
 Doubling 4 times, means `inc` would be applied $$2^4=16$$ times. The expected answer would be 21. To verify,
@@ -84,7 +93,7 @@ In this exercise, we are tasked with the writing a function `repeated` which wou
 ; even?
 
 (define (repeated f n)
-  (cond ((= n 1) f)
+  (cond ((= n 0) (lambda (x) x))
         ((even? n)
          (double (repeated f (/ n 2))))
         (else
@@ -98,7 +107,7 @@ To test it, we run through the example cases.
 ((repeated square 2) 5)
 ; 625
 ((repeated inc 100) 5)
-; 125
+; 105
 {% endhighlight %}
 
 ### Exercise 1.44<a name="Exercise1_44">&nbsp;</a>
@@ -148,3 +157,235 @@ As can be seen, correct answers are obtained.
 
 ### Exercise 1.45<a name="Exercise1_45">&nbsp;</a>
 
+In this exercise, we are essentially tasked with tweaking the number of damps to ensure that the roots of polynomials converge when fixed-point iteration is used. To study this, let use the modified `fixed-point` function that outputs intermediate values in the `fixed-point-of-transform` function.
+
+{% highlight scheme %}
+(define tolerance 0.00001)
+; tolerance
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) 
+       tolerance))
+  (define (try guess)
+    (display guess)
+    (newline)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+; fixed-point
+
+(define (fixed-point-of-transform 
+         g transform guess)
+  (fixed-point (transform g) guess))
+; fixed-point-of-transform
+{% endhighlight %}
+
+Let us create a root function which computes the *n*-th root of x and also takes starting guess and the number of damps used. We can utilize the `repeated` function from the previous exercise.
+
+{% highlight scheme %}
+(define (avg x y) (/ (+ x y) 2.0))
+; avg
+
+(define (avg-damp f)
+  (lambda (x) (avg x (f x))))
+; avg-damp
+
+(define (n-th-root-helper n x damps first-guess)
+  (fixed-point-of-transform
+    (lambda (y) (/ x (expt y (- n 1))))
+    (repeated avg-damp damps)
+    first-guess))
+; n-th-root-helper
+{% endhighlight %}
+
+Let us find the roots of various powers. Let us start with square root with no damping
+
+{% highlight scheme %}
+(n-th-root-helper 2 4 0 1.0)
+; 1.
+; 4.
+; 1.
+; 4.
+...
+{% endhighlight %}
+
+As can be seen, we see a repeating pattern. The process does not converge. Let us add one damping. If iteration converges, only the last value is given for brevity.
+
+{% highlight scheme %}
+(n-th-root-helper 2 4 1 1.0)
+; 2.000000000000002
+(n-th-root-helper 3 8 1 1.0)
+; 1.9999981824788517
+
+(n-th-root-helper 4 16 1 1.0)
+...
+; 2.0093631665789298
+; 1.9907673178391767
+; 2.009361536417286
+; 1.9907689027452413
+...
+{% endhighlight %}
+
+As can be seen, the 4-th root with 1 damp causes oscillation around the actual value. Thus, one average damp is not sufficient for 4-th root and above. Let us add one more damp and try again.
+
+{% highlight scheme %}
+(n-th-root-helper 4 16 2 1.0)
+; 2.0000000000021965
+(n-th-root-helper 5 32 2 1.0)
+; 2.000001512995761
+(n-th-root-helper 6 64 2 1.0)
+; 2.0000029334662086
+(n-th-root-helper 7 128 2 1.0)
+; 2.0000035538623377
+
+(n-th-root-helper 8 256 2 1.0)
+...
+; 2.0028934283781528
+; 1.9971357466538153
+; 2.002893090970039
+; 1.9971360772727353
+...
+{% endhighlight %}
+
+Thus, damping twice stops being effective from the 8-th root onwards. We can sort of see a relationship here. Let us verify this by checking if 3 damps stop being effective for the 16-th root onwards.
+
+{% highlight scheme %}
+(n-th-root-helper 15 (expt 2 15) 3 1.0)
+; 2.0000040951543028
+
+(n-th-root-helper 16 (expt 2 16) 3 1.0)
+...
+; 2.001635453681883
+; 1.9983845140195047
+; 2.001635149361151
+; 1.998384810927022
+...
+{% endhighlight %}
+
+Thus, we have verified that for 16-th root onwards 3 damps are not sufficient. We can see the following pattern:-
+
+- Roots of 2-3 require 1 damp
+- Roots of 3-7 require 2 damps
+- Roots of 8-15 require 3 damps
+- Roots of 16-... require 4 damps
+
+As *n* reaches powers of two, one more average damp is needed to compute root. Thus, the number of damps required $$D$$ can be computed using the floor function.
+
+$$D=\lfloor{log_2{n}}\rfloor$$
+
+Let us create a generic n-th-root function using this knowledge.
+
+{% highlight scheme %}
+(define (n-th-root n x)
+  (define (log2 x) (/ (log x) (log 2)))
+  (let ((damps (floor (log2 n))))
+    (n-th-root-helper n x damps 1.0)))
+{% endhighlight %}
+
+To test it, let us find large roots of numbers.
+
+{% highlight scheme %}
+(n-th-root 100 (expt 2 100))
+; 2.0000032790812043
+(n-th-root 200 (expt 2 200))
+; 2.0000021535853345
+{% endhighlight %}
+
+It works!
+
+### Exercise 1.46<a name="Exercise1_46">&nbsp;</a>
+
+In this exercise, we are tasked with writing a generic procedure called `iterative-improve` which takes in two procedures, one two check if a guess is good enough and one to improve the guess. This procedure should return a procedure which, when applied to a guess should improve it iteratively. This is a simple task that can be accomplished using the following code.
+
+{% highlight scheme %}
+(define (iterative-improve good-enough? improve)
+  (define (iterate guess)
+    (if (good-enough? guess)
+        guess
+        (iterate (improve guess))))
+   iterate)
+{% endhighlight %}
+
+##### Sqrt function
+
+Let us consider the original `sqrt` function
+
+{% highlight scheme %}
+(define (sqrt x)
+   (sqrt-iter 1.0 x))
+
+(define (sqrt-iter guess x)
+   (if (good-enough? guess x)
+       guess
+       (sqrt-iter (improve guess x)
+                  x)))
+
+(define (improve guess x)
+   (average guess (/ x guess)))
+
+(define (average x y)
+   (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+ (< (abs (- (square guess) x)) 0.001))
+
+(define (square x) (* x x))
+{% endhighlight %}
+
+It can be rewritten as follows by reusing some of its functions:-
+{% highlight scheme %}
+(define (sqrt x)
+  ((iterative-improve
+     (lambda (guess)
+       (< (abs (- (square guess) x)) 0.001))
+     (lambda (guess)
+       (average guess (/ x guess))))
+   1.0))
+; sqrt
+
+(sqrt 2)
+; 1.4142156862745097
+(sqrt 100)
+; 10.000000000139897
+{% endhighlight %}
+
+##### Fixed-point iteration function
+
+Let us reconsider the fixed-point iteration function.
+
+{% highlight scheme %}
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) 
+       tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+{% endhighlight %}
+
+It can be rewritten as follows:-
+
+{% highlight scheme %}
+(define (fixed-point f first-guess)
+  ((iterative-improve
+     (lambda (guess)
+       (< (abs (- (f guess) guess)) tolerance))
+     (lambda (guess)
+       (f guess)))
+   first-guess))
+; fixed-point
+
+(fixed-point cos 1.0)
+; .7390893414033927
+(fixed-point (lambda (y) (+ (sin y) (cos y)))
+             1.0)
+; 1.2587228743052672
+{% endhighlight %}
