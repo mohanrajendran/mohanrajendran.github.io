@@ -283,7 +283,7 @@ Let us test it
 
 ### Exercise 2.6<a name="Exercise2_6">&nbsp;</a>
 
-In this exercise, we are tasked with implementing [Church numerals](http://www.wikiwand.com/en/Church_encoding) and defining `one` and `two` directly without using `zero` and `add-1` defined below.
+In this exercise, we are tasked with implementing [Church numerals](http://en.wikipedia.org/wiki/Church_encoding) and defining `one` and `two` directly without using `zero` and `add-1` defined below.
 
 {% highlight scheme %}
 (define zero (lambda (f) (lambda (x) x)))
@@ -313,7 +313,7 @@ Following the hint, let us see what `(add-1 zero)` evaluates to.
 
 Thus, we get a procedure which takes a function `f` and returns a prodecure which in turn takes an argument `x` and evaluates `(f x)`.
 
-Looking at the Church numerals [wiki page](http://www.wikiwand.com/en/Church_encoding), we can see this matches the description given where $$ 0 = \lambda f.\lambda x.x $$ and $$ 1 = \lambda f.\lambda x.f\;x$$.
+Looking at the Church numerals [wiki page](http://en.wikipedia.org/wiki/Church_encoding), we can see this matches the description given where $$ 0 = \lambda f.\lambda x.x $$ and $$ 1 = \lambda f.\lambda x.f\;x$$.
 
 Thus, by extension, number *n* is applies `f` *n* times. We get the following definition of `one` and `two`:-
 

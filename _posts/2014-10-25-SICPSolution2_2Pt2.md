@@ -245,7 +245,7 @@ As can be seen, both answers match. However, the new code is longer and much har
 
 ### Exercise 2.12<a name="Exercise2_12">&nbsp;</a>
 
-In this exercise, we are tasked with creating procedures to support intervals specified by the center point and the percentage of error. We can reuse the `make-center-width`, `width` and `center` code givn in the book. The code for percentage-based interval is as follows:-
+In this exercise, we are tasked with creating procedures to support intervals specified by the center point and the percentage of error. We can reuse the `make-center-width`, `width` and `center` code given in the book. The code for percentage-based interval is as follows:-
 
 {% highlight scheme %}
 (define (make-center-percent center percent)
