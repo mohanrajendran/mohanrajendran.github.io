@@ -8,6 +8,9 @@ submenu:
    - { hook: "Exercise2_18", title: "Exercise 2.18" }
    - { hook: "Exercise2_19", title: "Exercise 2.19" }
    - { hook: "Exercise2_20", title: "Exercise 2.20" }
+   - { hook: "Exercise2_21", title: "Exercise 2.21" }
+   - { hook: "Exercise2_22", title: "Exercise 2.22" }
+   - { hook: "Exercise2_23", title: "Exercise 2.23" }
 ---
 
 ### Exercise 2.17<a name="Exercise2_17">&nbsp;</a>
@@ -133,3 +136,158 @@ In this exercise, we are tasked with using the *dotted-tail notation* to define 
 (same-parity 2 3 4 5 6 7)
 ; (2 4 6)
 {% endhighlight %}
+
+### Exercise 2.21<a name="Exercise2_21">&nbsp;</a>
+
+In this exercise, we are tasked with creating a procedure `square-list` by filling the missing expressions in the given procedures. The two procedures perform the operation directly and using `map` respectively. W
+
+{% highlight scheme %}
+(define (square-list items)
+  (if (null? items)
+      nil
+      (cons (square (car items)) (square-list (cdr items)))))
+; square-list
+
+(square-list (list 1 2 3 4))
+; (1 4 9 16)
+{% endhighlight %}
+
+{% highlight scheme %}
+(define (square-list items)
+  (map square items))
+; square-list
+
+(square-list (list 1 2 3 4))
+; (1 4 9 16)
+{% endhighlight %}
+
+As can be seen, both definitions give the same correct answer. However, the second case would be a better definition because of its simplicity.
+
+### Exercise 2.22<a name="Exercise2_22">&nbsp;</a>
+
+In this exercise, we are tasked with determining why the `square-list` procedure written by Louis Reasoner does not exactly give the right answer.
+
+##### Original code
+
+The first iteration of the `square-list` procedure is as follows.
+
+{% highlight scheme %}
+(define (square-list items)
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons (square (car things))
+                    answer))))
+  (iter items nil))
+; square-list
+
+(square-list (list 1 2 3 4))
+; (16 9 4 1)
+{% endhighlight %}
+
+As can be seen, we get the expected result, but in reverse. To see how this happens, let us expand the evaluation.
+
+{% highlight scheme %}
+(square-list (list 1 2 3 4))
+
+(iter (list 1 2 3 4) nil)
+
+(iter (list 2 3 4) (cons 1 nil))
+
+(iter (list 3 4) (cons 4 (cons 1 nil)))
+
+(iter (list 4) (cons 9 (cons 4 (cons 1 nil))))
+
+(iter nil (cons 16 (cons 9 (cons 4 (cons 1 nil)))))
+
+(cons 16 (cons 9 (cons 4 (cons 1 nil))))
+
+(16 9 4 1)
+{% endhighlight %}
+
+Thus, to fix this reversal, Louis tries to switch the arguement to `cons`.
+
+##### Reversed code
+
+Let us look at the reversed code and its execution.
+
+{% highlight scheme %}
+(define (square-list items)
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons answer
+                    (square 
+                     (car things))))))
+  (iter items nil))
+; square-list
+
+(square-list (list 1 2 3 4))
+; ((((() . 1) . 4) . 9) . 16)
+{% endhighlight %}
+
+Now the values appear in the right order but the lists appear wonky. Let us see why.
+
+{% highlight scheme %}
+(square-list (list 1 2 3 4))
+
+(iter (list 1 2 3 4) nil)
+
+(iter (list 2 3 4) (cons nil 1))
+
+(iter (list 3 4) (cons (cons nil 1) 4))
+
+(iter (list 4) (cons (cons (cons nil 1) 4) 9))
+
+(iter nil (cons (cons (cons (cons nil 1) 4) 9) 16))
+
+(cons (cons (cons (cons nil 1) 4) 9) 16)
+
+((((() . 1) . 4) . 9) . 16)
+{% endhighlight %}
+
+Thus, we can see that this doesn't work either because putting `nil` in the `car` position does not make it vanish.
+
+##### Fixed code
+
+Since we have the things in the right order, we can use our old friend `append` to make things appear as they should.
+
+{% highlight scheme %}
+(define (square-list items)
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (append answer
+                    (list (square (car things)))))))
+  (iter items nil))
+; square-list
+
+(square-list (list 1 2 3 4))
+; (1 4 9 16)
+{% endhighlight %}
+
+Thus, we have the right answer by eliminating the `nil` in the wrong places and flattening the list at each iteration.
+
+### Exercise 2.23<a name="Exercise2_23">&nbsp;</a>
+
+We are asked to implement a procedure called `for-each` in this exercise. This procedure takes a procedure and a list. The procedure does not evaluate to anything but simply perform an action. It can be done using the following code.
+
+{% highlight scheme %}
+(define (for-each f items)
+  (if (null? items)
+      #t
+      (begin (f (car items))
+             (for-each f (cdr items)))))
+; for-each
+
+(for-each f (list 57 321 88))
+; 57
+; 321
+; 88
+; #t
+{% endhighlight %}
+
+Note that `begin` is used to sequence the operations so that they can be executed together.
