@@ -46,7 +46,7 @@ In this exercise, we are tasked with writing a procedure `reverse` which can be 
 ; append
 
 (define (reverse items)
-  (if (null? (cdr items))
+  (if (null? items)
       items
       (append (reverse (cdr items))
               (list (car items)))))
@@ -61,8 +61,6 @@ In this exercise, we are tasked with writing a procedure `reverse` which can be 
 In this exercise, we are tasked with rewriting the change-counting program in Section 1.2.2 so that they can be used on arbitrary currency by allowing the denominations to be specified as a list. We are given the folowing function `cc`:-
 
 {% highlight scheme %}
-
-
 (define (cc amount coin-values)
   (cond ((= amount 0) 
          1)
