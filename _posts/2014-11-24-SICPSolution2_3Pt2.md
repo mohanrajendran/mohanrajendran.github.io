@@ -224,7 +224,7 @@ In this exercise, we are asked to create a set representation that allows us to 
   (define (remove-element x set)
     (if (equal? x (car set))
         (cdr set)
-		(cons (car set) (remove-element x (cdr set)))))
+        (cons (car set) (remove-element x (cdr set)))))
   (cond ((or (null? set1) (null? set2)) '())
         ((element-of-set? (car set1) set2)
          (cons (car set1)
@@ -255,11 +255,11 @@ This kind of representation of sets is used for different use cases compared to 
 
 Compared to the previous case, efficiency is as follows:-
 
-|                  | No Duplicates | With Duplicates |
-|------------------|---------------|-----------------|
-| element-of-set?  | $$O(n)$$      | $$O(n)$$        |
-| adjoin-set       | $$O(n)$$      | $$O(1)$$        |
-| union-set        | $$O(n^2)$$    | $$O(n)$$        |
-| intersection-set | $$O(n^2)$$    | $$O(n^2)$$      |
+|                  | No Duplicates      | With Duplicates      |
+|------------------|--------------------|----------------------|
+| element-of-set?  | $$\Theta(n)$$      | $$\Theta(n)$$        |
+| adjoin-set       | $$\Theta(n)$$      | $$\Theta(1)$$        |
+| union-set        | $$\Theta(n^2)$$    | $$\Theta(n)$$        |
+| intersection-set | $$\Theta(n^2)$$    | $$\Theta(n^2)$$      |
 
 We can see that having duplicates simplifies adjoin and union operations. This is because we do not perform `element-of-set?` anymore for these operations. However, if there are a lot of duplicate elements, the time complexity would go up for the `union-set` and `intersection-set` procedures because *n* would tend to be a high value for the lists with duplicate elements.

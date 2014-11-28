@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<?xml-stylesheet href="../../css/fonts/fonts.css" type="text/css"?><svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   preserveAspectRatio="xMinYMin meet"
+   viewBox="0 0 142 169"
+   id="svg9530"
+   style="display:inline"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   width="100%"
+   height="100%"
+   sodipodi:docname="Fig2.16c.std.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1855"
+     inkscape:window-height="1056"
+     id="namedview3153"
+     showgrid="false"
+     inkscape:zoom="1.6321938"
+     inkscape:cx="279.30255"
+     inkscape:cy="20.087637"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg9530" />
+  <defs
+     id="defs9532" />
+  <metadata
+     id="metadata_2.16">
+    <!--
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type>
+        <dc:title></dc:title>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/3.0/"></cc:license>
+        <dc:description>Based on the diagram in Abelson, Sussman &amp; Sussman's "Structure and Interpretation of Computer Programs", 2nd ed.</dc:description>
+        <dc:source>http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-16.html#%_fig_2.16</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Andres Raba</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:date>2012-11-17</dc:date>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>set</rdf:li>
+            <rdf:li>binary</rdf:li>
+            <rdf:li>tree</rdf:li>
+            <rdf:li>node</rdf:li>
+            <rdf:li>left</rdf:li>
+            <rdf:li>right</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License rdf:about="http://creativecommons.org/licenses/by-sa/3.0/">
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits>
+        <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires>
+        <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits>
+        <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires>
+      </cc:License>
+    </rdf:RDF>
+  -->
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:none;stroke:#383838;stroke-width:0.81173772;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+     id="path9625"
+     d="M 35.719866,25.467058 16.628996,63.6488" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:none;stroke:#383838;stroke-width:0.81173772;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     id="path9625-9-1"
+     d="M 7.0835662,101.83053 26.174436,140.01227" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:none;stroke:#383838;stroke-width:0.81173772;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     id="path9625-9"
+     d="m 61.807456,24.854386 19.09087,38.181732" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:none;stroke:#383838;stroke-width:0.81173772;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     id="path9625-9-8"
+     d="m 99.447036,101.83053 19.090874,38.18174" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:none;stroke:#383838;stroke-width:0.81173772;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     id="path9625-99-2-76"
+     d="m 86.862726,101.83053 -19.09087,38.18174" />
+  <text
+     sodipodi:linespacing="125%"
+     style="font-size:24.81812859px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;display:inline;font-family:Linux Biolinum O;-inkscape-font-specification:Linux Biolinum O"
+     xml:space="preserve"
+     id="text9553"
+     y="18.984993"
+     x="47.504765"><tspan
+       id="tspan9555"
+       y="18.984993"
+       x="47.504765">5</tspan></text>
+  <text
+     sodipodi:linespacing="125%"
+     style="font-size:24.81812859px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;display:inline;font-family:Linux Biolinum O;-inkscape-font-specification:Linux Biolinum O"
+     xml:space="preserve"
+     id="text9557"
+     y="92.285103"
+     x="5.1744828"><tspan
+       id="tspan9559"
+       y="92.285103"
+       x="5.1744828">1</tspan></text>
+  <text
+     sodipodi:linespacing="125%"
+     style="font-size:24.81812859px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;display:inline;font-family:Linux Biolinum O;-inkscape-font-specification:Linux Biolinum O"
+     xml:space="preserve"
+     id="text9561"
+     y="92.285103"
+     x="89.901611"><tspan
+       id="tspan9563"
+       y="92.285103"
+       x="89.901611">9</tspan></text>
+  <text
+     sodipodi:linespacing="125%"
+     style="font-size:24.81812859px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;display:inline;font-family:Linux Biolinum O;-inkscape-font-specification:Linux Biolinum O"
+     xml:space="preserve"
+     id="text9573"
+     y="168.64857"
+     x="128.08334"><tspan
+       id="tspan9575"
+       y="168.64857"
+       x="128.08334">11</tspan></text>
+  <text
+     sodipodi:linespacing="125%"
+     style="font-size:24.81812859px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;display:inline;font-family:Linux Biolinum O;-inkscape-font-specification:Linux Biolinum O"
+     xml:space="preserve"
+     id="text9605"
+     y="168.64857"
+     x="58.226444"><tspan
+       id="tspan9607"
+       y="168.64857"
+       x="58.226444">7</tspan></text>
+  <text
+     sodipodi:linespacing="125%"
+     style="font-size:24.81812859px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;display:inline;font-family:Linux Biolinum O;-inkscape-font-specification:Linux Biolinum O"
+     xml:space="preserve"
+     id="text9569"
+     y="168.64857"
+     x="35.719868"><tspan
+       id="tspan9571"
+       y="168.64857"
+       x="35.719868">3</tspan></text>
+</svg>
