@@ -183,7 +183,7 @@ In this exercise, we are given the code that generates a balanced binary tree gi
 
 The diagram of the tree that was produced is given below:-
 
-<center><img src="/images/Ex2_64_Tree.svg" alt="Balanced binary tree" height="1200"/></center>
+<center><img src="/images/Ex2_64_Tree.svg" alt="Balanced binary tree" height="200"/></center>
 
 `list->tree` works by delegating its job to `partial-tree` which takes in two arguments, a list `elts` and a number `n`. With these, it returns a tuple. The first element contains the balanced tree constructed using the first *n* members of *elts* and the remaining members in a list. The initial recursion is initiated by requesting a tree with all the elements in the list.
 

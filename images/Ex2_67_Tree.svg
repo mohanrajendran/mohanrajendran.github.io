@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<?xml-stylesheet href="../../css/fonts/fonts.css" type="text/css"?><svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   preserveAspectRatio="xMinYMin meet"
+   viewBox="0 0 282 216"
+   id="svg11297"
+   style="display:inline"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   width="100%"
+   height="100%"
+   sodipodi:docname="Fig2.18a.std.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1855"
+     inkscape:window-height="1056"
+     id="namedview3137"
+     showgrid="false"
+     inkscape:zoom="2"
+     inkscape:cx="302.49639"
+     inkscape:cy="47.130122"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg11297" />
+  <defs
+     id="defs11299" />
+  <metadata
+     id="metadata_2.18">
+    <!--
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type>
+        <dc:title></dc:title>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/3.0/"></cc:license>
+        <dc:description>Based on the diagram in Abelson, Sussman &amp; Sussman's "Structure and Interpretation of Computer Programs", 2nd ed.</dc:description>
+        <dc:source>http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-16.html#%_fig_2.18</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Andres Raba</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:date>2012-11-17</dc:date>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>Huffman</rdf:li>
+            <rdf:li>encoding</rdf:li>
+            <rdf:li>code</rdf:li>
+            <rdf:li>tree</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License rdf:about="http://creativecommons.org/licenses/by-sa/3.0/">
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"></cc:permits>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"></cc:permits>
+        <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"></cc:requires>
+        <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"></cc:requires>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"></cc:permits>
+        <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"></cc:requires>
+      </cc:License>
+    </rdf:RDF>
+  -->
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g3382"
+     transform="translate(-148.42313,-9.95322)">
+    <path
+       d="M 233.38098,36.588958 176.10816,93.861774"
+       id="path11387-0"
+       style="fill:none;stroke:#383838;stroke-width:1.01467586;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:connector-curvature="0" />
+    <path
+       d="M 233.38098,36.588958 290.6538,93.861774"
+       id="path11387"
+       style="fill:none;stroke:#383838;stroke-width:1.01467586;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:connector-curvature="0" />
+    <path
+       d="m 294.472,93.861784 a 3.81819,3.81819 0 0 1 -7.63638,0 3.81819,3.81819 0 1 1 7.63638,0 z"
+       id="path11927-6-1"
+       style="fill:#383838;fill-opacity:1;stroke:none;display:inline"
+       inkscape:connector-curvature="0" />
+    <path
+       d="m 237.19918,36.588964 a 3.81819,3.81819 0 0 1 -7.63638,0 3.81819,3.81819 0 1 1 7.63638,0 z"
+       id="path11927"
+       style="fill:#383838;fill-opacity:1;stroke:none;display:inline"
+       inkscape:connector-curvature="0" />
+    <path
+       d="m 290.60767,93.90791 -57.27233,57.27232"
+       id="path12512"
+       style="fill:none;stroke:#383838;stroke-width:1.01467586;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:connector-curvature="0" />
+    <text
+       x="233.38098"
+       y="25.498026"
+       id="text11320"
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;font-family:Inconsolata LGC;-inkscape-font-specification:Inconsolata LGC"
+       sodipodi:linespacing="125%"><tspan
+         x="233.38098"
+         y="25.498026"
+         id="tspan11322">{A B D C} 8</tspan></text>
+    <text
+       x="290.65381"
+       y="84.770836"
+       id="text11320-5"
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#383838;fill-opacity:1;stroke:none;font-family:Inconsolata LGC;-inkscape-font-specification:Inconsolata LGC"
+       sodipodi:linespacing="125%"><tspan
+         x="290.65381"
+         y="84.770836"
+         id="tspan11322-9">{B D C} 4</tspan></text>
+    <text
+       x="164.65359"
+       y="117.99816"
+       id="text12021"
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;font-family:Inconsolata LGC;-inkscape-font-specification:Inconsolata LGC"
+       sodipodi:linespacing="125%"><tspan
+         x="164.65359"
+         y="117.99816"
+         id="tspan12023">A 4</tspan></text>
+    <text
+       x="215.60796"
+       y="169.27127"
+       id="text12183"
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;font-family:Inconsolata LGC;-inkscape-font-specification:Inconsolata LGC"
+       sodipodi:linespacing="125%"><tspan
+         x="215.60796"
+         y="169.27127"
+         id="tspan12185">B 2</tspan></text>
+    <path
+       d="m 290.34287,93.27091 57.27282,57.27282"
+       id="path11387-8"
+       style="fill:none;stroke:#383838;stroke-width:1.01467586;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:connector-curvature="0" />
+    <path
+       d="m 351.43389,150.54374 a 3.81819,3.81819 0 0 1 -7.63638,0 3.81819,3.81819 0 1 1 7.63638,0 z"
+       id="path11927-6-1-8"
+       style="fill:#383838;fill-opacity:1;stroke:none;display:inline"
+       inkscape:connector-curvature="0" />
+    <path
+       d="m 347.56956,150.58986 -57.27233,57.27232"
+       id="path12512-0"
+       style="fill:none;stroke:#383838;stroke-width:1.01467586;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:connector-curvature="0" />
+    <text
+       x="351.61572"
+       y="143.45279"
+       id="text11320-5-7"
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#383838;fill-opacity:1;stroke:none;display:inline;font-family:Inconsolata LGC;-inkscape-font-specification:Inconsolata LGC"
+       sodipodi:linespacing="125%"><tspan
+         x="351.61572"
+         y="143.45279"
+         id="tspan11322-9-9">{D C} 2</tspan></text>
+    <text
+       x="272.56985"
+       y="225.95322"
+       id="text12183-0"
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;display:inline;font-family:Inconsolata LGC;-inkscape-font-specification:Inconsolata LGC"
+       sodipodi:linespacing="125%"><tspan
+         x="272.56985"
+         y="225.95322"
+         id="tspan12185-8">D 1</tspan></text>
+    <path
+       d="m 345.86359,149.36359 57.27282,57.27282"
+       id="path11387-8-0"
+       style="fill:none;stroke:#383838;stroke-width:1.01467586;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:connector-curvature="0" />
+    <text
+       x="412.94629"
+       y="224.29004"
+       id="text12183-0-7"
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#383838;fill-opacity:1;stroke:none;display:inline;font-family:Inconsolata LGC;-inkscape-font-specification:Inconsolata LGC"
+       sodipodi:linespacing="125%"><tspan
+         x="412.94629"
+         y="224.29004"
+         id="tspan12185-8-6">C 1</tspan></text>
+  </g>
+</svg>
