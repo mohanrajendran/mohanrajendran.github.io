@@ -28,22 +28,24 @@ We are given the following code which does that:-
 (define (operands exp) (cdr exp))
 {% endhighlight %}
 
-1. The first part of the question asks us to describe what is happening in the code above and why the predicates for `number?` and `variable?` cannot be combined into the data-direction dispatch described in this section.
+##### Part-1
+The first part of the question asks us to describe what is happening in the code above and why the predicates for `number?` and `variable?` cannot be combined into the data-direction dispatch described in this section.
 
-In the code above, when given an expression, we first use the built-in function `number?` to check if the expression is a number and return 0. Then, when given a symbol, we check if it is the same as the variable with we are differentiating with respect to and returns 0 or 1. Finally, we user the `operator` function to obtain the operator of the expression which can be `'+`, or `'*` as we had seen before. We then use the `get` function to look up the exact `deriv` procedure define for the particular expression and apply them to the expression.
+	In the code above, when given an expression, we first use the built-in function `number?` to check if the expression is a number and return 0. Then, when given a symbol, we check if it is the same as the variable with we are differentiating with respect to and returns 0 or 1. Finally, we user the `operator` function to obtain the operator of the expression which can be `'+`, or `'*` as we had seen before. We then use the `get` function to look up the exact `deriv` procedure define for the particular expression and apply them to the expression.
 
-Now, we are also asked why the number and variable branches cannot be merged. The reason for that is because these expressions are the primitive parts which do not have a type tag. So there is no dispatching based on the operator type. They are therefore they are dispatched based on their data type.
+	Now, we are also asked why the number and variable branches cannot be merged. The reason for that is because these expressions are the primitive parts which do not have a type tag. So there is no dispatching based on the operator type. They are therefore they are dispatched based on their data type.
 
-2. In the second part of the exercise, we are told to write the procedures for derivatives of sums and products along with the code to install them in the table to be used by the given code. For that purpose, let us implement a the dispatch table using the built-in `hashtable` which supports the `put` and `get` operations.
+##### Part-2
+In the second part of the exercise, we are told to write the procedures for derivatives of sums and products along with the code to install them in the table to be used by the given code. For that purpose, let us implement a the dispatch table using the built-in `hashtable` which supports the `put` and `get` operations.
 
 {% highlight scheme %}
 (define (equal? p1 p2)
   (cond ((and (null? p1) (null? p2)) #t)
         ((or (null? p1) (null? p2)) #f)
-        ((and (pair? p1) (pair? p2))
-         (and (equal? (car p1) (car p2))
-              (equal? (cdr p1) (cdr p2))))
-        ((or (pair? p1) (pair? p2)) #f)
+		((and (pair? p1) (pair? p2))
+		  (and (equal? (car p1) (car p2))
+			   (equal? (cdr p1) (cdr p2))))
+	    ((or (pair? p1) (pair? p2)) #f)
         (else (eq? p1 p2))))
 ; equal?
 
@@ -127,7 +129,8 @@ Using the above code, we initialize everything the `deriv` program needs. We can
 ; (+ (* x y) (* y (+ x 3)))
 {% endhighlight %}
 
-3. In the third part of the exercise, we are told to create an additional package such as one for differentiating exponents and install it into the system. Let us write the code which does that.
+##### Part-3
+In the third part of the exercise, we are told to create an additional package such as one for differentiating exponents and install it into the system. Let us write the code which does that.
 
 {% highlight scheme %}
 (define (install-deriv-package-exponentiation)
@@ -173,7 +176,8 @@ Using the above code, we initialize everything the `deriv` program needs. We can
 
 By simply installing the new functions into the dispatch table, we extend the functionality of the `deriv` system. Note that we have retyped some internal functions such as `=number?` and `make-product`. The constructors need to be implemented globally so that they can be reused. Further, any upgrade to these procedures can be done in one location and the changes can propogate consistently.
 
-4. In the final part of the exercise, we ae asked how we can change the order of indexing in `get` by using the following code instead.
+##### Part-4
+In the final part of the exercise, we ae asked how we can change the order of indexing in `get` by using the following code instead.
 
 {% highlight scheme %}
 ((get (operator exp) 'deriv) 
