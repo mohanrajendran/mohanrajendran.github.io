@@ -83,13 +83,35 @@ In this exercise, we are tasked with implementing `equ?` which can be used as a 
                         (* (numer y) (denom x)))))
   (put 'equ? '(complex complex)
        (lambda (x y) (and (= (real-part x) (real-part y))
-                          (= (imag-part x) (imag-part y))))))
+                          (= (imag-part x) (imag-part y)))))
+  'done)
 
 (define (equ? x y)
   (apply-generic 'equ? x y))
 {% endhighlight %}
 
-Installing the above code would allow `equ?` to compare the three types of numbers.
+Installing the above code would allow `equ?` to compare the three types of numbers as follows:-
+
+{% highlight scheme %}
+(equ? (make-scheme-number 4)
+      (make-scheme-number 2))
+; #f
+(equ? (make-scheme-number 4)
+      (make-scheme-number 4))
+; #t
+(equ? (make-rational 4 8)
+      (make-rational 2 4))
+; #t
+(equ? (make-complex-from-real-imag 4 3)
+      (make-complex-from-real-imag 4 3))
+; #t
+(equ? (make-complex-from-real-imag 4 0)
+      (make-complex-from-mag-ang 4 0))
+; #t
+(equ? (make-complex-from-real-imag 4 3)
+      (make-complex-from-mag-ang 4 3))
+; #f
+{% endhighlight %}
 
 ### Exercise 2.80<a name="Exercise2_80">&nbsp;</a>
 
@@ -102,10 +124,28 @@ Similar to `equ?` in the previous exercise, we are told to implement `=zero?`, a
   (put '=zero? '(rational)
        (lambda (x) (= (numer x) 0)))
   (put '=zero? '(complex)
-       (lambda (x) (= (magnitude x) 0))))
+       (lambda (x) (= (magnitude x) 0)))
+  'done)
 
 (define (=zero? x)
   (apply-generic '=zero? x))
 {% endhighlight %}
 
-Now, we can check if any type of number is zero.
+Now, we can check if any type of number is zero as follows:-
+
+{% highlight scheme %}
+(=zero? (make-scheme-number 1))
+; #f
+(=zero? (make-scheme-number 0))
+; #t
+(=zero? (make-rational 1 2))
+; #f
+(=zero? (make-rational 0 2))
+; #t
+(=zero? (make-complex-from-real-imag 0 0))
+; #t
+(=zero? (make-complex-from-real-imag 1 0))
+; #f
+(=zero? (make-complex-from-mag-ang 0 1))
+; #t
+{% endhighlight %}

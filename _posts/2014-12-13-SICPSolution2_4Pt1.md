@@ -31,9 +31,9 @@ We are given the following code which does that:-
 ##### Part-1
 The first part of the question asks us to describe what is happening in the code above and why the predicates for `number?` and `variable?` cannot be combined into the data-direction dispatch described in this section.
 
-	In the code above, when given an expression, we first use the built-in function `number?` to check if the expression is a number and return 0. Then, when given a symbol, we check if it is the same as the variable with we are differentiating with respect to and returns 0 or 1. Finally, we user the `operator` function to obtain the operator of the expression which can be `'+`, or `'*` as we had seen before. We then use the `get` function to look up the exact `deriv` procedure define for the particular expression and apply them to the expression.
+In the code above, when given an expression, we first use the built-in function `number?` to check if the expression is a number and return 0. Then, when given a symbol, we check if it is the same as the variable with we are differentiating with respect to and returns 0 or 1. Finally, we user the `operator` function to obtain the operator of the expression which can be `'+`, or `'*` as we had seen before. We then use the `get` function to look up the exact `deriv` procedure define for the particular expression and apply them to the expression.
 
-	Now, we are also asked why the number and variable branches cannot be merged. The reason for that is because these expressions are the primitive parts which do not have a type tag. So there is no dispatching based on the operator type. They are therefore they are dispatched based on their data type.
+Now, we are also asked why the number and variable branches cannot be merged. The reason for that is because these expressions are the primitive parts which do not have a type tag. So there is no dispatching based on the operator type. They are therefore they are dispatched based on their data type.
 
 ##### Part-2
 In the second part of the exercise, we are told to write the procedures for derivatives of sums and products along with the code to install them in the table to be used by the given code. For that purpose, let us implement a the dispatch table using the built-in `hashtable` which supports the `put` and `get` operations.
