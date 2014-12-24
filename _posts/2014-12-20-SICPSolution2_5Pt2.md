@@ -7,7 +7,6 @@ submenu:
    - { hook: "Exercise2_81", title: "Exercise 2.81" }
    - { hook: "Exercise2_82", title: "Exercise 2.82" }
    - { hook: "Exercise2_83", title: "Exercise 2.83" }
-   - { hook: "Exercise2_84", title: "Exercise 2.84" }
 ---
 ### Exercise 2.81<a name="Exercise2_81">&nbsp;</a>
 
@@ -68,7 +67,7 @@ In this part, we are told to modify `apply-generic` so that it does not try coer
                     (a2 (cadr args)))
                 (if (eq? type1 type2)
                     (error "No method for these types"
-                           (list op type-tages))
+                           (list op type-tags))
                     ((let ((t1->t2
                             (get-coercion type1
                                           type2))
@@ -193,7 +192,7 @@ In this exercise, we are asked to design a procedure that raises the type of the
        (lambda (r)
          (make-scheme-number (exact->inexact (/ (numer r) (denom r))))))
   (put 'raise '(scheme-number)
-       (lambda (n) (make-from-real-imag n 0)))
+       (lambda (n) (make-complex-from-real-imag n 0)))
   'done)
 
 (define (raise x)
