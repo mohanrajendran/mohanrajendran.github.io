@@ -60,7 +60,7 @@ In this exercise, we are told to modify the definitions of `type-tag`, `contents
   (cond ((pair? datum) (car datum))
         ((number? datum) 'scheme-number)
         (else (error "Bad tagged datum: 
-                      TYPE-TAG" datum)))
+                      TYPE-TAG" datum))))
 
 (define (contents datum)
   (cond ((pair? datum) (cdr datum))
