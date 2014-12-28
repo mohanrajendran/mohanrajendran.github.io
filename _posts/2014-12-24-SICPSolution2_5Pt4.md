@@ -6,6 +6,7 @@ title: "SICP Section 2.5 Exercise Solutions - Part 4"
 submenu:
    - { hook: "Exercise2_87", title: "Exercise 2.87" }
    - { hook: "Exercise2_88", title: "Exercise 2.88" }
+   - { hook: "Exercise2_89", title: "Exercise 2.89" }
 ---
 ### Exercise 2.87<a name="Exercise2_87">&nbsp;</a>
 
@@ -137,3 +138,87 @@ With the negation implemented and tested, we can extend the polynomial system to
 ; (polynomial x (1 1) (4 5) (2 -6) (3 1))
 {% endhighlight %}
 
+### Exercise 2.89<a name="Exercise2_89">&nbsp;</a>
+
+In this exercise, we are tasked with implementing a dense representation of polynomial terms as opposed to the sparse representation provided in the book along with the required procedures. In the sparse representation, we just store the coefficients of the polynomial in the order that they appear in without the power terms.
+
+The method proposed should maintain the same external interface as the dense representation that is used by the `polynomial` package to access the coefficients. We should also traverse the list while emitting the actual order the coefficients belong to. To do this, we need to add one more item that refers to the order of the first coefficient in the list.
+
+{% highlight scheme %}
+(define (make-term-list starting-order coefficients)
+  (cons starting-order coefficients))
+(define (starting-order term-list)
+  (car term-list))
+(define (coefficients term-list)
+  (cdr term-list))
+(define (strip-leading-zeros term-list)
+  (if (or (empty-termlist? term-list)
+          (not (=zero? (car (coefficients term-list)))))
+	  term-list
+	  (strip-leading-zeros
+	    (make-term-list (- (starting-order term-list) 1)
+		                (cdr (coefficients term-list))))))
+
+(define (adjoin-term term term-list)
+  (if (=zero? (coeff term))
+      term-list
+	  (if (empty-termlist? term-list)
+	      (make-term-list (order term)
+		                  (list (coeff term)))
+	      (if (= (- (order term) 1)
+	             (starting-order term-list))
+		      (make-term-list (order term)
+		                      (cons (coeff term)
+						            (coefficients term-list)))
+	          (adjoin-term term
+		                   (make-term-list (+ (starting-order term-list) 1)
+					                       (cons 0 (coefficients term-list))))))))
+(define (the-empty-termlist)
+  (make-term-list (- 1) ()))
+(define (first-term term-list)
+  (make-term (starting-order term-list)
+             (car (coefficients term-list))))
+(define (rest-terms term-list)
+  (strip-leading-zeros
+    (make-term-list (- (starting-order term-list) 1)
+	                (cdr (coefficients term-list)))))
+(define (empty-termlist? term-list)
+  (null? (coefficients term-list)))
+(define (make-term order coeff) 
+  (list order coeff))
+(define (order term) (car term))
+(define (coeff term) (cadr term))
+{% endhighlight %}
+
+We also place a new negation function for the dense term-list:-
+
+{% highlight scheme %}
+(define (negate-termlist t)
+  (if (empty-termlist? t)
+      t
+      (make-term-list (starting-order t)
+	                  (map negate (coefficients t)))))
+(put 'negate '(polynomial)
+     (lambda (p) (make-polynomial (variable p)
+                                  (negate-termlist (term-list p)))))
+{% endhighlight %}
+
+Let us test it out:-
+
+{% highlight scheme %}
+(define x (the-empty-termlist))
+; x
+(adjoin-term (make-term 3 2) x)
+; (3 2)
+(adjoin-term (make-term 5 1) (adjoin-term (make-term 3 2) x))
+; (5 1 0 2)
+(first-term (adjoin-term (make-term 5 1) (adjoin-term (make-term 3 2) x)))
+;(5 1)
+(rest-terms (adjoin-term (make-term 5 1) (adjoin-term (make-term 3 2) x)))
+; (3 2)
+
+(negate (make-polynomial 'x (list 5 1 2 0 3 (- 2) (- 5))))
+; (polynomial x 5 -1 -2 0 -3 2 5)
+(add (make-polynomial 'x (list 5 1 2 0 3 (- 2) (- 5))) (make-polynomial 'x (list 4 1 2 3 4 5)))
+; (polynomial x 5 1 (integer . 3) 2 (integer . 6) (integer . 2) 0)
+{% endhighlight %}
