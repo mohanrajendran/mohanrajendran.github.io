@@ -222,6 +222,15 @@ Note:- Since our old number tower is beyond the scope of upcoming exercises, we 
                     (term-list p2)))
         (error "Polys not in same var: ADD-POLY"
                (list p1 p2))))
+  (define (sub-poly p1 p2)
+    (if (same-variable? (variable p1) 
+                        (variable p2))
+        (make-poly 
+         (variable p1)
+         (add-terms (term-list p1)
+                    (negate (term-list p2))))
+        (error "Polys not in same var: SUB-POLY"
+               (list p1 p2))))
   (define (mul-poly p1 p2)
     (if (same-variable? (variable p1) 
                         (variable p2))
@@ -231,7 +240,6 @@ Note:- Since our old number tower is beyond the scope of upcoming exercises, we 
                       (term-list p2)))
           (error "Polys not in same var: MUL-POLY"
                  (list p1 p2))))
-
   (define (add-terms L1 L2)
     (cond ((empty-termlist? L1) L2)
           ((empty-termlist? L2) L1)
@@ -258,7 +266,6 @@ Note:- Since our old number tower is beyond the scope of upcoming exercises, we 
                      (add-terms 
                       (rest-terms L1)
                       (rest-terms L2)))))))))
-
   (define (mul-terms L1 L2)
     (if (empty-termlist? L1)
         L1
@@ -278,9 +285,6 @@ Note:- Since our old number tower is beyond the scope of upcoming exercises, we 
             t1 
             (rest-terms L))))))
 
-  (define (sub-poly p1 p2)
-    (add (tag p1) (negate (tag p2))))
-
   ;; External interface
   (define (tag p) (attach-tag 'polynomial p))
   (put 'add '(polynomial polynomial)
@@ -290,7 +294,8 @@ Note:- Since our old number tower is beyond the scope of upcoming exercises, we 
        (lambda (p1 p2) 
          (tag (mul-poly p1 p2))))
   (put 'sub '(polynomial polynomial)
-       sub-poly)
+       (lambda (p1 p2)
+	      (tag (sub-poly p1 p2))))
   (put 'make 'polynomial
        (lambda (var terms) 
          (tag (make-poly var terms))))
