@@ -2,7 +2,7 @@
 layout: post
 category: [SICP, Solutions]
 post_no: 39
-title: "SICP Section 3.2 Exercise Solutions - Part 1"
+title: "SICP Section 3.2 Exercise Solution"
 submenu:
    - { hook: "Exercise3_9", title: "Exercise 3.9" }
    - { hook: "Exercise3_10", title: "Exercise 3.10" }
@@ -146,6 +146,24 @@ Next, calling `(define acc (make-account 50))` evaluates the function body and p
 <img src="/images/Ex3_11_Step2.svg" alt="After defining acc"/>
 </center>
 
-After that, calling `((acc 'deposit) 40)` does the following:-
+After that, when we call `((acc 'deposit) 40)` the inner function evaluates to `deposit` in environment *E1* and subsequently, that gets evaluated:-
 
+<center>
+<img src="/images/Ex3_11_Step3.svg" alt="After calling deposit"/>
+</center>
 
+Evaluating *E2* updates the value of `balance` prints out the updated balance value of *90*. Next, calling `((acc 'withdraw) 60)` does something similar:-
+
+<center>
+<img src="/images/Ex3_11_Step4.svg" alt="After calling withdraw"/>
+</center>
+
+Evaluating *E3* updates `balance` and outputs `30`.
+
+Finally, calling `(define acc2 (make-account 100))` sets up the following:-
+
+<center>
+<img src="/images/Ex3_11_Step5.svg" alt="After defining acc2"/>
+</center>
+
+As can be seen, defining `acc2` creates a new sub-environment that tracks its own value of `balance` in local environment. Like before, the code for the sub-functions `deposit`, `withdraw` and `dispatch` are shared but the with pointers back to different environments. 
