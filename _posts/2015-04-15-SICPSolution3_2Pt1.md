@@ -2,7 +2,7 @@
 layout: post
 category: [SICP, Solutions]
 post_no: 39
-title: "SICP Section 3.2 Exercise Solution"
+title: "SICP Section 3.2 Exercise Solutions"
 submenu:
    - { hook: "Exercise3_9", title: "Exercise 3.9" }
    - { hook: "Exercise3_10", title: "Exercise 3.10" }
