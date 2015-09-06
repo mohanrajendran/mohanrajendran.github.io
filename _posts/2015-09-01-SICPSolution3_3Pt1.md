@@ -13,7 +13,6 @@ submenu:
 
 In this exercise, we are tasked with investigating a mutable version of the `append` function seen before called `append!` as defined below:-
 
-
 {% highlight scheme %}
 (define (append! x y)
   (set-cdr! (last-pair x) y)
@@ -53,7 +52,7 @@ Next, we are told to call `(cdr x)`. As can be seen from the box and pointer dia
 
 Next, we set things up using the new code:-
 
-{% highlight language %}
+{% highlight scheme %}
 (define w (append! x y))
 
 w
