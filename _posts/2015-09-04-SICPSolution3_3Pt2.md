@@ -8,6 +8,7 @@ submenu:
 - { hook: "Exercise 3_16", title: "Exercise 3.16" }
 - { hook: "Exercise 3_17", title: "Exercise 3.17" }
 - { hook: "Exercise 3_18", title: "Exercise 3.18" }
+- { hook: "Exercise 3_19", title: "Exercise 3.19" }
 ---
 
 ### Exercise 3.15<a name="Exercise3_15">&nbsp;</a>
@@ -135,7 +136,7 @@ The code would keep evaluating along the cycle and never return at all.
 
 
 ### Exercise 3.17<a name="Exercise3_17">&nbsp;</a>
-
+	
 In this exercise, we are required to create a correct version of `create-pairs` which returns the correct number of distinct pairs. One good way to do it is to maintain a list of pairs already encountered and only count pairs not seen before. One way is as follows:-
 
 {% highlight scheme %}
@@ -176,3 +177,71 @@ y
 
 ### Exercise 3.18<a name="Exercise3_18">&nbsp;</a>
 
+In this exercise, we are tasked with implementing a procedure that determines if a list contains a cycle. It is given that a list with cycle is defined as one that would result in an infinite loop if successive `cdr` is invoked on it. We can use the code from the previous exercise which tracks the pairs seen already to perform this check:-
+
+{% highlight scheme %}
+(define (has-cycle? x)
+  (define encountered '())
+  (define (check-if-seen x)
+    (cond ((not (pair? x)) #f)
+	      ((memq x encountered) #t)
+	      (else (begin (set! encountered (cons x encountered))
+		               (check-if-seen (cdr x))))))
+  (check-if-seen x))
+{% endhighlight %}
+
+Let us go ahead and test this code on the cases from before. Only *z* should result in true:-
+
+{% highlight scheme %}
+(has-cycle? w)
+; #f
+
+(has-cycle? x)
+; #f
+
+(has-cycle? y)
+; #f
+
+(has-cycle? z)
+; #t
+{% endhighlight %}
+
+### Exercise 3.19<a name="Exercise3_19">&nbsp;</a>
+
+In this exercise, we are tasked with re-implementing the `has-cycle?` code from the previous exercise so that only constant space is required. It can be implemented using [Floyd's algorithm](https://en.wikipedia.org/wiki/Cycle_detection#Tortoise_and_hare). 
+
+{% highlight scheme %}
+(define (has-cycle? x)
+  (define (safe-cdr x)
+    (if (pair? x)
+	(cdr x)
+	'()))
+  (define (safe-cddr x)
+    (safe-cdr (safe-cdr x)))
+  (define (advance-pointer t h)
+    (cond ((null? h) #f)
+	  ((eq? t h) #t)
+	  (else (advance-pointer
+		 (safe-cdr t)
+		 (safe-cddr h)))))
+  (advance-pointer x (safe-cdr x)))
+{% endhighlight %}
+
+With this, let us test the cases from before:-
+
+{% highlight scheme %}
+(has-cycle? w)
+; #f
+
+(has-cycle? x)
+; #f
+
+(has-cycle? y)
+; #f
+
+(has-cycle? z)
+; #t
+
+(has-cycle? (cons 'd z))
+; #t
+{% endhighlight %}
