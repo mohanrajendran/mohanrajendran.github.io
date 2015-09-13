@@ -9,6 +9,7 @@ submenu:
 - { hook: "Exercise 3_17", title: "Exercise 3.17" }
 - { hook: "Exercise 3_18", title: "Exercise 3.18" }
 - { hook: "Exercise 3_19", title: "Exercise 3.19" }
+- { hook: "Exercise 3_20", title: "Exercise 3.20" }
 ---
 
 ### Exercise 3.15<a name="Exercise3_15">&nbsp;</a>
@@ -79,7 +80,7 @@ This list can be constructed simply by a linear list which yields the following 
 As can be seen, in this simple case, the algorithm gives the right answer.
 
 #### 4 pairs
-
+	
 This list can be constructed as follows:-
 
 <center>
@@ -245,3 +246,61 @@ With this, let us test the cases from before:-
 (has-cycle? (cons 'd z))
 ; #t
 {% endhighlight %}
+
+
+### Exercise 3.20<a name="Exercise3_20">&nbsp;</a>
+
+In this exercise, we are tasked with giving the environment diagrams when the following code is executed:-
+
+{% highlight scheme %}
+(define (cons x y)
+  (define (set-x! v) (set! x v))
+  (define (set-y! v) (set! y v))
+  (define (dispatch m)
+    (cond ((eq? m 'car) x)
+          ((eq? m 'cdr) y)
+          ((eq? m 'set-car!) set-x!)
+          ((eq? m 'set-cdr!) set-y!)
+          (else (error "Undefined 
+                 operation: CONS" m))))
+  dispatch)
+
+(define (car z) (z 'car))
+(define (cdr z) (z 'cdr))
+
+(define (set-car! z new-value)
+  ((z 'set-car!) new-value)
+  z)
+
+(define (set-cdr! z new-value)
+  ((z 'set-cdr!) new-value)
+  z)
+
+(define x (cons 1 2))
+(define z (cons x x))
+
+(set-car! (cdr z) 17)
+
+(car x)
+17
+{% endhighlight %}
+
+Initially, when the definition for `cons`, `car`, `cdr`, `set-car!` and `set-cdr!` is set up, the environment looks like the following:-
+
+<center>
+<img src="/images/Ex3_20_Step1.svg" alt="After definition of cons"/>
+</center>
+
+Next, defining *x* and *z* sets up the following:-
+
+<center>
+<img src="/images/Ex3_20_Step2.svg" alt="After defining x and z"/>
+</center>
+
+When we call `(cdr z)` we evaluate to *x*. Then, calling `set-car!` on that alters the value of *x* in environment *E1* to 17 as follows:-
+
+<center>
+<img src="/images/Ex3_20_Step3.svg" alt="After calling set-car"/>
+</center>
+
+We have skipped evaluation of `cdr` and `set-car!` to drill down to the lower levels. Finally, evaluating in *E5* sets the value of *x* in *E1* to 17.
