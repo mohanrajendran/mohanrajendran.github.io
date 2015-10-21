@@ -4,9 +4,9 @@ category: [SICP, Solutions]
 post_no: 41
 title: "SICP Section 3.3 Exercise Solutions Part 1"
 submenu:
-- { hook: "Exercise 3_12", title: "Exercise 3.12" }
-- { hook: "Exercise 3_13", title: "Exercise 3.13" }
-- { hook: "Exercise 3_14", title: "Exercise 3.14" }
+   - { hook: "Exercise3_12", title: "Exercise 3.12" }
+   - { hook: "Exercise3_13", title: "Exercise 3.13" }
+   - { hook: "Exercise3_14", title: "Exercise 3.14" }
 ---
 
 ### Exercise 3.12<a name="Exercise3_12">&nbsp;</a>

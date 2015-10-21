@@ -4,12 +4,11 @@ category: [SICP, Solutions]
 post_no: 42
 title: "SICP Section 3.3 Exercise Solution Part 2"
 submenu:
-- { hook: "Exercise 3_15", title: "Exercise 3.15" }
-- { hook: "Exercise 3_16", title: "Exercise 3.16" }
-- { hook: "Exercise 3_17", title: "Exercise 3.17" }
-- { hook: "Exercise 3_18", title: "Exercise 3.18" }
-- { hook: "Exercise 3_19", title: "Exercise 3.19" }
-- { hook: "Exercise 3_20", title: "Exercise 3.20" }
+   - { hook: "Exercise3_15", title: "Exercise 3.15" }
+   - { hook: "Exercise3_16", title: "Exercise 3.16" }
+   - { hook: "Exercise3_17", title: "Exercise 3.17" }
+   - { hook: "Exercise3_18", title: "Exercise 3.18" }
+   - { hook: "Exercise3_19", title: "Exercise 3.19" }
 ---
 
 ### Exercise 3.15<a name="Exercise3_15">&nbsp;</a>
