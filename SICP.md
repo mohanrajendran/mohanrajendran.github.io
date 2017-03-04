@@ -15,7 +15,7 @@ To supplement the book, I will also be following the original online lectures by
 
 
 <ul>
-	{% assign sicp_posts = site.categories.sicp | sort:"post_no" %}
+	{% assign sicp_posts = site.categories.SICP | sort:"post_no" %}
 	{% for post in sicp_posts %}
 		<li>
 			<a href="{{ post.url }}">{{ post.title }}</a>
