@@ -21,3 +21,7 @@ author:
 
 github:
   repo:              https://www.github.com/mohanrajendran
+
+# Collections
+collections:
+  sicp:

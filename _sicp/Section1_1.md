@@ -1,8 +1,7 @@
 ---
-layout: post
-categories: [SICP, Summary]
-post_no: 1
-title: SICP Section 1.1 Summary
+layout: page
+order: 1
+title: Section 1.1 Summary
 ---
 
 # Elements of Programming
@@ -12,8 +11,6 @@ This section gives a basic understanding of [Scheme](http://en.wikipedia.org/wik
 - **primitive expressions** used to represent the simplest entities in a language (*arithmetic, conditional evaluation, etc*)
 - **combinations** arising from combining the primitive expressions (*mathematical formulas, etc*)
 - **abstractions** which are combinations manipulated as units (*functions, subroutines, etc*)
-
-<!--excerpt-->
 
 #### Expressions
 

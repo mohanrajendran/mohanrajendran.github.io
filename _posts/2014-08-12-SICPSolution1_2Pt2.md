@@ -17,7 +17,7 @@ submenu:
 
 ### Exercise 1.20<a name="Exercise1_20">&nbsp;</a>
 
-In this exercise, we revisit the applicative and normal-order evaluation strategies presented in [Section 1.1]({% post_url 2014-07-27-SICPSection1_1 %}) to trace the given function and determine how many times `remainder` is called.
+In this exercise, we revisit the applicative and normal-order evaluation strategies presented in Section 1.1 to trace the given function and determine how many times `remainder` is called.
 
 {% highlight scheme %}
 (define (gcd a b)

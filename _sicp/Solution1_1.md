@@ -1,8 +1,8 @@
 ---
-layout: post
-categories: [SICP, Solutions]
-post_no: 2
-title: SICP Section 1.1 Exercise Solutions
+layout: page
+order: 2
+title: Section 1.1 solutions
+exercises: '1.1 - 1.8'
 submenu:
   - { hook: "Exercise1_1", title: "Exercise 1.1" }
   - { hook: "Exercise1_2", title: "Exercise 1.2" }
