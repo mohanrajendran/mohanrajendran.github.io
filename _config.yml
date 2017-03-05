@@ -14,3 +14,4 @@ gems:             [jekyll-paginate]
 
 excerpt_separator: <!--excerpt-->
 paginate:         5
+theme: jekyll-theme-cayman
