@@ -143,7 +143,7 @@ y
 The final state of the pointers look like the following:-
 
 <center>
-<img src="/images/Ex3_14_Fine.svg" alt="After defining w"/>
+<img src="/images/Ex3_14_Final.svg" alt="After defining w"/>
 </center>
 
 Due to the mutating nature of this function, the original value of *v* also changes. Let us verify that:-
