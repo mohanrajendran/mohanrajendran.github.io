@@ -60,7 +60,7 @@ In this exercise, we are required to re-write the given `make-table` function to
 
 ### Exercise 3.25<a name="Exercise3_25">&nbsp;</a>
 
-In this exercise, we are tasked with implementing a table that can store values under an arbitrary number of keys as opposed to the 1- and 2-dimensional tables described in this section. This can be done using a recursive solution that goes through the keys and traverses the table data structure. Further a record node at any depth can contain a value or 
+In this exercise, we are tasked with implementing a table that can store values under an arbitrary number of keys as opposed to the 1- and 2-dimensional tables described in this section. This can be done using a recursive solution that goes through the keys and traverses the table data structure. Further a record node at any depth can contain a value or another table. 
 
 {% highlight scheme %}
 (define (make-n-table)

@@ -6,11 +6,11 @@ permalink:           pretty
 
 # Setup
 title:               Mohan Rajendran
-tagline:             'Blog'
-description:         'Hi! I am Mohan Rajendran. A Software Engineer who happens to be an Aerospace Engineer is his previous lifetime. <br> I will be posting snippets from my personal projects and learnings in this blog.'
+tagline:             'Personal Website'
+description:         'Personal Website'
 url:                 mohanrajendran.com
-baseurl:             ''
-excerpt_separator: <!--excerpt-->
+baseurl:             /
+excerpt_separator:   <!--excerpt-->
 paginate:            5
 gems:                [jekyll-paginate]
 
