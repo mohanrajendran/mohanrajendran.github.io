@@ -4,7 +4,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script type="text/javascript" src="{{ site.baseurl }}public/js/scrollspy.js"></script>
 <link rel="stylesheet" href="{{ site.baseurl }}public/css/spiedpage.css">
-<body>
+<body data-spy="scroll" data-target="#contents">
     {% include sidebar.html %}
     <div class="content container">
         <div class="page">
@@ -12,12 +12,12 @@
             {{ content }}
         </div>
     </div>
-    <nav class="scroll-spy">
+    <nav id="contents">
         <ul class="nav nav-tabs">
             {% for menu in page.submenu %}
             <li><a href="#{{ menu.hook }}">{{ menu.title }}</li>
             {% endfor %}
         </ul>
-    </div>
+    </nav>
 </body>
 </html>
