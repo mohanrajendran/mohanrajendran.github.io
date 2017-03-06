@@ -1,0 +1,7 @@
+.scroll-spy {
+    width: 263px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding-left: 20px;
+}

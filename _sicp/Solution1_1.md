@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: spiedpage
 order: 2
 title: Section 1.1 solutions
 exercises: '1.1 - 1.8'

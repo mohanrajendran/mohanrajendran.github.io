@@ -25,3 +25,4 @@ github:
 # Collections
 collections:
   sicp:
+    output: true
