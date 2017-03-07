@@ -56,8 +56,6 @@ This exercise deals with evaluating some Scheme functions and reporting their ou
 ; 16
 {% endhighlight %}
 
-<!--excerpt-->
-
 ### Exercise 1.2<a id="Exercise1_2">&nbsp;</a>
 
 This exercise deals with the translation of an equation into the prefix form. The equation and expected answer are as follows:-

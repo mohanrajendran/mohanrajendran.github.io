@@ -1,4 +1,4 @@
-#contents {
+.contents {
     width: 263px;
     position: fixed;
     top: 0;
@@ -6,28 +6,28 @@
     padding: 20px;
 }
 
-#contents .nav {
+.contents .nav {
     list-style-type: none;
 }
 
-#contents .nav > li > a {
+.contents .nav > li > a {
   display: block;
   padding: 4px 20px;
   font-size: 13px;
   font-weight: 500;
   color: #767676;
 }
-#contents .nav > li > a:hover,
-#contents .nav > li > a:focus {
+.contents .nav > li > a:hover,
+.contents .nav > li > a:focus {
   padding-left: 19px;
   color: #202020;
   text-decoration: none;
   background-color: transparent;
   border-left: 1px solid #202020;
 }
-#contents .nav > .active > a,
-#contents .nav > .active:hover > a,
-#contents .nav > .active:focus > a {
+.contents .nav > .active > a,
+.contents .nav > .active:hover > a,
+.contents .nav > .active:focus > a {
   padding-left: 18px;
   font-weight: bold;
   color: #202020;
