@@ -54,8 +54,6 @@ This exercise deals with diferrentiating between recursive and iterative process
 9
 {% endhighlight %}
 
-<!--excerpt-->
-
 As can be seen, there is a chain of deferred `inc` operations as function is evaluated. Thus, this process is *recursive*.
 
 Another way to determine that this process is recursive is by observing that the recursive call is nested within another function. The outer function needs to be stored by the interpreter until the inner function returns from the recursive evaluation.
@@ -672,8 +670,6 @@ In this exercise, we revisit the applicative and normal-order evaluation strateg
       a
       (gcd b (remainder a b))))
 {% endhighlight %}
-
-<!--excerpt-->
 
 #### Normal-order evaluation
 

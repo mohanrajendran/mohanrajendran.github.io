@@ -35,7 +35,6 @@ where $$h = (b-a)/n$$, $$n$$ is even and $$y_k=f(a+kh)$$.
 To make it amenable to be solved using the given `sum` function, we can transform the equation to
 
 $$\int_a^b f(x) \,dx = \frac{h}{3}[(y_0-y_n)+(4y_1+2y_2)+(4y_3+2y_4)+...+(4y_{n-1}+2y_n)]$$
-<!--excerpt-->
 
 Translating this to Scheme, we arrive at:-
 
@@ -360,8 +359,6 @@ Unfortunately, the statement `(2 2)` can't be evaluated since 2 is not function.
 
 Thus, application of `2` throws an error.
 
-<!--excerpt-->
-
 ### Exercise 1.35<a id="Exercise1_35">&nbsp;</a>
 
 In this exercise, we are simply tasked with utilizing the pre-defined `fixed-point` procedure to determine the golden ratio $$\varphi$$ given by the formula $$x\mapsto1+1/x$$. To perform that we use the following code.
@@ -608,8 +605,6 @@ This exercise tasks us with creating a function `cubic` which can be used in con
 {% endhighlight %}
 
 This can be used by Newton's method to determine the roots.
-
-<!--excerpt-->
 
 ### Exercise 1.41<a id="Exercise1_41">&nbsp;</a>
 
