@@ -1,19 +1,19 @@
 ---
-layout: post
-category: [SICP, Solutions]
-post_no: 37
-title: "SICP Section 3.1 Exercise Solutions"
+layout: spiedpage
+order: 18
+title: Section 3.1 solutions
+exercises: '3.1 - 3.8'
 submenu:
-   - { hook: "Exercise3_1", title: "Exercise 3.1" }
-   - { hook: "Exercise3_2", title: "Exercise 3.2" }
-   - { hook: "Exercise3_3", title: "Exercise 3.3" }
-   - { hook: "Exercise3_4", title: "Exercise 3.4" }
-   - { hook: "Exercise3_5", title: "Exercise 3.5" }
-   - { hook: "Exercise3_6", title: "Exercise 3.6" }
-   - { hook: "Exercise3_7", title: "Exercise 3.7" }
-   - { hook: "Exercise3_8", title: "Exercise 3.8" }
+  - { hook: "Exercise3_1", title: "Exercise 3.1" }
+  - { hook: "Exercise3_2", title: "Exercise 3.2" }
+  - { hook: "Exercise3_3", title: "Exercise 3.3" }
+  - { hook: "Exercise3_4", title: "Exercise 3.4" }
+  - { hook: "Exercise3_5", title: "Exercise 3.5" }
+  - { hook: "Exercise3_6", title: "Exercise 3.6" }
+  - { hook: "Exercise3_7", title: "Exercise 3.7" }
+  - { hook: "Exercise3_8", title: "Exercise 3.8" }
 ---
-### Exercise 3.1<a name="Exercise3_1">&nbsp;</a>
+### Exercise 3.1<a id="Exercise3_1">&nbsp;</a>
 
 In this exercise, we are tasked with writing a procedure `make-accumulator` which can be used to generate accumulaors which can maintain their independant sum. It can be done using the following code by maintaining a local variable:-
 
@@ -33,9 +33,8 @@ In this exercise, we are tasked with writing a procedure `make-accumulator` whic
 {% endhighlight %}
 
 Thus, an accumulator object is created.
-<!--excerpt-->
 
-### Exercise 3.2<a name="Exercise3_2">&nbsp;</a>
+### Exercise 3.2<a id="Exercise3_2">&nbsp;</a>
 
 In this exercise, we are asked to write a procedure `make-monitored` which takes in a procedure `f` which itself takes in one input and returns a modified procedure `mf`. It can be used to keep track of the number of times the function was called. The following code allows us to achieve that by updating a local variable each time a function is called:-
 
@@ -61,7 +60,7 @@ In this exercise, we are asked to write a procedure `make-monitored` which takes
 ; 2
 {% endhighlight %}
 
-### Exercise 3.3<a name="Exercise3_3">&nbsp;</a>
+### Exercise 3.3<a id="Exercise3_3">&nbsp;</a>
 
 In this exercise, we need to modify the `make-account` procedure given in the book to take passowords.
 
@@ -96,7 +95,7 @@ check-and-dispatch)
 
 Of course, passwords cannot be stored plainly as shown are usually stored hashed.
 
-### Exercise 3.4<a name="Exercise3_4">&nbsp;</a>
+### Exercise 3.4<a id="Exercise3_4">&nbsp;</a>
 
 In this exercise, we are told to extend the password protected transactions above to call the cops if the number of wrong tries consecutively exceeds 7. The following code does that:-
 
@@ -143,7 +142,7 @@ In this exercise, we are told to extend the password protected transactions abov
 
 Each correct password resets the counter and each wrong password increments the `calls` counter. When it reaches 7, we call the cops even if right password is input.
 
-### Exercise 3.5<a name="Exercise3_5">&nbsp;</a>
+### Exercise 3.5<a id="Exercise3_5">&nbsp;</a>
 
 In this exercise, we are told to use the `monte-carlo` function given in the book to perform *Monte Carlo integration*. The function is as follows:-
 
@@ -204,7 +203,7 @@ We can test this code by finding the area of a unit circle.
 
 As can be seen we get a good approximation for $\pi$ which is the area of a unit circle. We can use any size of rectangle to compute this value.
 
-### Exercise 3.6<a name="Exercise3_6">&nbsp;</a>
+### Exercise 3.6<a id="Exercise3_6">&nbsp;</a>
 
 In this exercise we are tasked with writing a modified random-number generator that can have its seed set so that we can perform repeated experiments. It can be achieved using the following code:-
 
@@ -259,7 +258,7 @@ The following tests can be run to verify the code:-
 
 As can be seen, we can reset the stream of random numbers anytime to our chosen value.
 
-### Exercise 3.7<a name="Exercise3_7">&nbsp;</a>
+### Exercise 3.7<a id="Exercise3_7">&nbsp;</a>
 
 In this exercise, we are required to create a procedure `make-account` which can be used to create joint accounts. The joint account should be operated from the original account using the original password as well. We do that with the following code:-
 
@@ -284,7 +283,7 @@ In this exercise, we are required to create a procedure `make-account` which can
 
 As seen, both accounts share the same internal balance amount. Now, we can add more helpful error messages to users based on which password is wrong.
 
-### Exercise 3.8<a name="Exercise3_8">&nbsp;</a>
+### Exercise 3.8<a id="Exercise3_8">&nbsp;</a>
 
 In this exercise, we are told to create a function `f` which, when substituted into `(+ (f 0) (f 1))` should evaluate to 0 when the subexpressions are evaluated from left to right and 1 otherwise. One such function is as follows:-
 
