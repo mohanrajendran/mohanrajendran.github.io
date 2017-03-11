@@ -1,9 +1,7 @@
 ---
 layout: page
-title: SICP
+title: Structure and Interpretation of Computer Programs
 ---
-
-## Structure And Interpretation of Computer Programs
 
 <center><a href="https://mitpress.mit.edu/sicp/full-text/book/book.html"><img src="/images/SICP_cover.jpg" alt="SICP cover" height="400" /></a></center>
 

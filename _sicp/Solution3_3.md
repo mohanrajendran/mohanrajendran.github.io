@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 22
 title: Section 3.3 solutions
-exercises: '3.12 - 3.25'
+exercises: '3.12 - 3.26'
 submenu:
   - { hook: "Exercise3_12", title: "Exercise 3.12" }
   - { hook: "Exercise3_13", title: "Exercise 3.13" }
@@ -18,6 +18,7 @@ submenu:
   - { hook: "Exercise3_23", title: "Exercise 3.23" }
   - { hook: "Exercise3_24", title: "Exercise 3.24" }
   - { hook: "Exercise3_25", title: "Exercise 3.25" }
+  - { hook: "Exercise3_26", title: "Exercise 3.26" }
 ---
 
 ### Exercise 3.12<a id="Exercise3_12">&nbsp;</a>
@@ -290,8 +291,6 @@ The code would keep evaluating along the cycle and never return at all.
 (count-pairs z)
 ; Aborting!: maximum recursion depth exceeded
 {% endhighlight %}
-
-
 
 ### Exercise 3.17<a id="Exercise3_17">&nbsp;</a>
 	
@@ -712,8 +711,6 @@ Let us test this code:-
 
 In this exercise, we are required to re-write the given `make-table` function to take another function as an argument which can be used as a custom equality checker that is different from the `equal?` function used by the given `assoc` function. The new constructor can be simply written by redefining the `assoc` function to use the argument instead.
 
-<!--excerpt-->
-
 {% highlight scheme %}
 (define (make-table same-key?)
   (let ((local-table (list '*table*)))
@@ -830,3 +827,93 @@ This can be tested using the following code:-
 (lookup table '(a b c d))
 ; #f
 {% endhighlight %}
+
+### Exercise 3.26<a id="Exercise3_26">&nbsp;</a>
+
+In this exercise, we are tasked with implementing the search table using a binary tree so that access would take a shorter time than a list. Since a binary tree requires a concept of ordering between keys, we have to make sure all keys are of the same type.
+
+{% highlight scheme %}
+(define (make-table comparator<?)
+  (define (make-node key value)
+    (cons (cons key value)
+          (cons '() '())))
+  (define (node-key node)
+    (caar node))
+  (define (node-value node)
+    (cdar node))
+  (define (node-left node)
+    (cadr node))
+  (define (node-right node)
+    (cddr node))
+  (define (set-node-value! node value)
+    (set-cdr! (car node) value))
+  (define (set-node-left! node left)
+    (set-car! (cdr node) left))
+  (define (set-node-right! node right)
+    (set-cdr! (cdr node) right))
+
+  (let ((root '()))
+    (define (lookup key)
+      (define (lookup-helper node)
+      (cond ((null? node) false)
+            ((comparator<? key (node-key node))
+             (lookup-helper (node-left node)))
+            ((comparator<? (node-key node) key)
+             (lookup-helper (node-right node)))
+            (else (node-value node))))      
+      (lookup-helper root))
+
+    (define (insert! key value)
+      (define (insert-helper! node)
+        (cond ((comparator<? key (node-key node))
+               (if (null? (node-left node))
+                   (set-node-left! node (make-node key value))
+                   (insert-helper! (node-left node))))
+              ((comparator<? (node-key node) key)
+               (if (null? (node-right node))
+                   (set-node-right! node (make-node key value))
+                   (insert-helper! (node-right node))))
+              (else (set-node-value! node value))))
+      (if (null? root)
+          (set! root (make-node key value))
+          (insert-helper! root)))
+
+    (define (dispatch m)
+      (cond ((eq? m 'lookup) lookup)
+            ((eq? m 'insert!) insert!)
+            (else (error "Unknown operation: TABLE" m))))
+    dispatch))
+
+(define (make-table-with-key-type key-type)
+  (let ((comparator (cond ((eq? key-type 'number) <)
+                          ((eq? key-type 'char) char<?)
+                          ((eq? key-type 'string) string<?)
+                          (else (error "Unknown key-type" key-type)))))
+    (make-table comparator)))
+(define (lookup table key) ((table 'lookup) key))
+(define (insert! table key value) ((table 'insert!) key value))
+{% endhighlight %}
+
+We can also test the code using a table with string key:-
+
+{% highlight scheme %}
+(define string-table (make-table-with-key-type 'string))
+; string-table
+
+(lookup string-table "hello")
+; #f
+
+(insert! string-table "hello" 42)
+(lookup string-table "hello")
+; 42
+
+(insert! string-table "world" 45)
+(lookup string-table "world")
+; 45
+
+(insert! string-table "hello" "new value")
+(lookup string-table "hello")
+; "new value"
+{% endhighlight %}
+
+Since there is no comparison with values, they can be of any arbitrary type.
