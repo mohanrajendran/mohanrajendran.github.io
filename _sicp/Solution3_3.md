@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 22
 title: Section 3.3 solutions
-exercises: '3.12 - 3.26'
+exercises: '3.12 - 3.27'
 submenu:
   - { hook: "Exercise3_12", title: "Exercise 3.12" }
   - { hook: "Exercise3_13", title: "Exercise 3.13" }
@@ -19,6 +19,7 @@ submenu:
   - { hook: "Exercise3_24", title: "Exercise 3.24" }
   - { hook: "Exercise3_25", title: "Exercise 3.25" }
   - { hook: "Exercise3_26", title: "Exercise 3.26" }
+  - { hook: "Exercise3_27", title: "Exercise 3.27" }
 ---
 
 ### Exercise 3.12<a id="Exercise3_12">&nbsp;</a>
@@ -917,3 +918,48 @@ We can also test the code using a table with string key:-
 {% endhighlight %}
 
 Since there is no comparison with values, they can be of any arbitrary type.
+
+### Exercise 3.27<a id="Exercise3_27">&nbsp;</a>
+
+In this exercise, we are required to draw en environment diagram for a memoized function defined using the following code:-
+
+{% highlight scheme %}
+(define (memoize f)
+  (let ((table (make-table)))
+    (lambda (x)
+      (let ((previously-computed-result 
+             (lookup x table)))
+        (or previously-computed-result
+            (let ((result (f x)))
+              (insert! x result table)
+              result))))))
+
+(define memo-fib
+  (memoize 
+   (lambda (n)
+     (cond ((= n 0) 0)
+           ((= n 1) 1)
+           (else 
+            (+ (memo-fib (- n 1))
+               (memo-fib (- n 2))))))))
+{% endhighlight %}
+
+The environment right after making these definitions looks like the following:-
+
+<center>
+<img src="/images/Ex3_27_Step1.svg" alt="Environment structure for memoized fibonacci"/>
+</center>
+
+Now whenever we call `memo-fib`, it first checks if the argumet is available in the `table` binding. If it is, it means that the function had been called previously with the same argument. In that case the retrieved value would be returned immediately. Otherwise the function does the actual fibonacci computation, inserts the value in the table and returns it. The environment diagram for that is as follows:-
+
+<center>
+<img src="/images/Ex3_27_Step2.svg" alt="Environment structure evaluating memo-fib"/>
+</center>
+
+When `(memo-fib 3)` is evaluated, it creates a new environment **E1** with an empty table. There `previously-computed-result` would be `#f` and it causes it to evaluate `(+ (memo-fib 2) (memo-fib 1))`. The first part is evaulated in **E2** and it in turn spawns **E3** and **E4**. At this point, the terminal conditions give results of *1* and *0* respectively. These two values are cached in the table at this point. The second part of **E2**, `(memo-fib 1)` is evaluated in **E5** finally. At this point, the argument of *1* is already computed and it simply returns the result directly. Assuming that the table lookup uses a constant time, we only need to calculate each number once. Since a call `(memo-fib n)` would entail calculating `(memo-fib (- n 1))` and so on until `(memo-fib 0)`, we require $n+1$ calculations and getting a $O(n) complexity.
+
+Now, if we merely defined `memo-fib` to be `(memoize fib)`, it would simply call `fib` recursively which itself is not memoized. This only the final result end up in the table and  all intermediate calculations need to be repeated.
+
+### Exercise 3.28<a id="Exercise3_28">&nbsp;</a>
+
+In this section, we are primarily interested in simulating digital circuits.
