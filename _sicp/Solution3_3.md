@@ -20,6 +20,7 @@ submenu:
   - { hook: "Exercise3_25", title: "Exercise 3.25" }
   - { hook: "Exercise3_26", title: "Exercise 3.26" }
   - { hook: "Exercise3_27", title: "Exercise 3.27" }
+  - { hook: "Exercise3_28", title: "Exercise 3.28" }
 ---
 
 ### Exercise 3.12<a id="Exercise3_12">&nbsp;</a>
@@ -962,4 +963,19 @@ Now, if we merely defined `memo-fib` to be `(memoize fib)`, it would simply call
 
 ### Exercise 3.28<a id="Exercise3_28">&nbsp;</a>
 
-In this section, we are primarily interested in simulating digital circuits.
+In this section, we are primarily interested in simulating digital circuits. We are given examples of `not-gate` and `and-gate`. We are required to define an `or-gate`. It can be defined as follows:-
+
+{% highlight scheme %}
+(define (or-gate a1 a2 output)
+  (define (or-action-procedure)
+    (let ((new-value
+           (logical-or (get-signal a1) 
+                        (get-signal a2))))
+      (after-delay 
+       or-gate-delay
+       (lambda ()
+         (set-signal! output new-value)))))
+  (or-action! a1 or-action-procedure)
+  (or-action! a2 or-action-procedure)
+  'ok)
+{% endhighlight %}
