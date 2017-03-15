@@ -21,6 +21,8 @@ submenu:
   - { hook: "Exercise3_26", title: "Exercise 3.26" }
   - { hook: "Exercise3_27", title: "Exercise 3.27" }
   - { hook: "Exercise3_28", title: "Exercise 3.28" }
+  - { hook: "Exercise3_29", title: "Exercise 3.29" }
+  - { hook: "Exercise3_30", title: "Exercise 3.30" }
 ---
 
 ### Exercise 3.12<a id="Exercise3_12">&nbsp;</a>
@@ -957,7 +959,7 @@ Now whenever we call `memo-fib`, it first checks if the argumet is available in 
 <img src="/images/Ex3_27_Step2.svg" alt="Environment structure evaluating memo-fib"/>
 </center>
 
-When `(memo-fib 3)` is evaluated, it creates a new environment **E1** with an empty table. There `previously-computed-result` would be `#f` and it causes it to evaluate `(+ (memo-fib 2) (memo-fib 1))`. The first part is evaulated in **E2** and it in turn spawns **E3** and **E4**. At this point, the terminal conditions give results of *1* and *0* respectively. These two values are cached in the table at this point. The second part of **E2**, `(memo-fib 1)` is evaluated in **E5** finally. At this point, the argument of *1* is already computed and it simply returns the result directly. Assuming that the table lookup uses a constant time, we only need to calculate each number once. Since a call `(memo-fib n)` would entail calculating `(memo-fib (- n 1))` and so on until `(memo-fib 0)`, we require $n+1$ calculations and getting a $O(n) complexity.
+When `(memo-fib 3)` is evaluated, it creates a new environment **E1** with an empty table. There `previously-computed-result` would be `#f` and it causes it to evaluate `(+ (memo-fib 2) (memo-fib 1))`. The first part is evaulated in **E2** and it in turn spawns **E3** and **E4**. At this point, the terminal conditions give results of *1* and *0* respectively. These two values are cached in the table at this point. The second part of **E2**, `(memo-fib 1)` is evaluated in **E5** finally. At this point, the argument of *1* is already computed and it simply returns the result directly. Assuming that the table lookup uses a constant time, we only need to calculate each number once. Since a call `(memo-fib n)` would entail calculating `(memo-fib (- n 1))` and so on until `(memo-fib 0)`, we require $$n+1$$ calculations and getting an $$O(n)$$ complexity.
 
 Now, if we merely defined `memo-fib` to be `(memoize fib)`, it would simply call `fib` recursively which itself is not memoized. This only the final result end up in the table and  all intermediate calculations need to be repeated.
 
@@ -978,4 +980,57 @@ In this section, we are primarily interested in simulating digital circuits. We 
   (or-action! a1 or-action-procedure)
   (or-action! a2 or-action-procedure)
   'ok)
+
+(define (logical-or s1 s2)
+  (cond ((or (= s1 1)
+             (= s2 1)) 1)
+        (else 0)))
+{% endhighlight %}
+
+### Exercise 3.29<a id="Exercise3_29">&nbsp;</a>
+
+In this exercise, we are asked to construct an or-gate using and-gates and inverters. For that purpose, we can use the [De Morgan's laws](https://www.wikiwand.com/en/De_Morgan's_laws#/Substitution_form). 
+
+$$(P \vee Q) \equiv \neg(\neg P \wedge \neg Q)$$
+
+Putting it together, we get the following:-
+
+{% highlight scheme %}
+(define (or-gate a1 a2 output)
+  (let ((a1not (make-wire))
+        (a2not (make-wire))
+        (outnot (make-wire)))
+    (inverter a1 a1not)
+    (inverter a2 a2not)
+    (and-gate a1not a2not outnot)
+    (inverter outnot output)
+    'ok))
+{% endhighlight %}
+
+In this process, we run the first two inverters simultaneously followed by an *and* operation and an inverter. Thus, the total delay would be:-
+
+$$\text{or-gate-delay} = 2*\text{inverter-delay} + \text{and-gate-delay}$$.
+
+### Exercise 3.30<a id="Exercise3_30">&nbsp;</a>
+
+In this exercise, we are required to implement a  *ripple-carry adder* which can be constructed by connection *n* full-adders serially. This setup takes two n-bit numbers $$A$$ and $$B$$, and outputs $$S=A+B$$ and $$C$$ where C is the carry bit from the addition process. This problem can be solved easily using a recursive solution, where an adder of length *n* can be constructed by taking an adder of length *n-1* and attaching a new full-adder's carry output to the carry input of the ripple-carry adder. A solution is as follows:-
+
+{% highlight scheme %}
+(define (ripple-carry-adder A B S C)
+  (if (= (length A)
+         (length B)
+         (length S))
+      (if (null? A)
+          (set-signal! C 0)
+          (let ((carry-wire (make-wire)))
+            (ripple-carry-adder (cdr A)
+                                (cdr B)
+                                (cdr S)
+                                carry-wire)
+            (full-adder (car A)
+                        (car B)
+                        carry-wire
+                        (car S)
+                        C)))
+      (error "Inputs and outputs must be of the same length" A B S)))
 {% endhighlight %}
