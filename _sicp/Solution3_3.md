@@ -24,6 +24,7 @@ submenu:
   - { hook: "Exercise3_29", title: "Exercise 3.29" }
   - { hook: "Exercise3_30", title: "Exercise 3.30" }
   - { hook: "Exercise3_31", title: "Exercise 3.31" }
+  - { hook: "Exercise3_32", title: "Exercise 3.32" }
 ---
 
 ### Exercise 3.12<a id="Exercise3_12">&nbsp;</a>
@@ -1103,3 +1104,16 @@ To demonstrate this we are tasked with giving the reponse to the half-adder exam
 {% endhighlight %}
 
 This is mainly due to the inverter in the half-adder. If the signal is not propagated, the default state would be having input and output of 0 which is inconsistent. This causes most of the problems seen. However, after cycling through all possible inputs, the behaviour returns back to normal.
+
+### Exercise 3.32<a id="Exercise3_32">&nbsp;</a>
+
+In this exercise, we are asked to justiy executing the actions registered for a segment in a FIFO order. For example, let us take a take a look at an and-gate with *0* and *1* as inputs and propogated. When we set inputs to *1* and *0* respectively, two events are added to the agenda in the following order:-
+
+1) Inputs are 1 and 1, output of 1
+2) Inputs are 0 and 1, output of 0
+
+Two events are generated because the change needs to be performed in two steps.
+
+If the events are executed in the FIFO order, the output temporarily gets set to an intermediate value of 1 and then settles with the correct value of 0. This phenomenon is called a [hazard](https://www.wikiwand.com/en/Hazard_(logic)).
+
+Now, if the events are executed in the LIFO order, we output gets set to 0 first and then to a wrong value of 1. This is because processing the events in the reverse order leads to having an incomplete intermediate state as the final state. Thus, the events for a segment should be executed in FIFO order to get the consistent final output.
