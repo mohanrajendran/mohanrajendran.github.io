@@ -23,6 +23,7 @@ submenu:
   - { hook: "Exercise3_28", title: "Exercise 3.28" }
   - { hook: "Exercise3_29", title: "Exercise 3.29" }
   - { hook: "Exercise3_30", title: "Exercise 3.30" }
+  - { hook: "Exercise3_31", title: "Exercise 3.31" }
 ---
 
 ### Exercise 3.12<a id="Exercise3_12">&nbsp;</a>
@@ -1021,7 +1022,8 @@ In this exercise, we are required to implement a  *ripple-carry adder* which can
          (length B)
          (length S))
       (if (null? A)
-          (set-signal! C 0)
+          (begin (set-signal! C 0)
+                 'ok)
           (let ((carry-wire (make-wire)))
             (ripple-carry-adder (cdr A)
                                 (cdr B)
@@ -1034,3 +1036,70 @@ In this exercise, we are required to implement a  *ripple-carry adder* which can
                         C)))
       (error "Inputs and outputs must be of the same length" A B S)))
 {% endhighlight %}
+
+To calculate the delay of the ripple-carry adder, let us start with half-adders.
+
+$$\begin{align}
+D_i &= \text{inverter-delay} \\
+D_a &= \text{and-gate-delay} \\
+D_o &= \text{or-gate-delay} \\
+
+\text{Half adder sum delay}, D_{hs} &= D_a + \max(D_o, D_a + D_i) \\
+\text{Half adder carry delay}, D_{hc} &= D_a \\
+
+\text{Full adder sum delay}, D_{fs} &= D_{hs} \\
+\text{Full adder carry delay}, D_{fc} &= D_o + \max(D_{hs}+D_{hc}, D_{hc}) \\
+&= D_o + D_{hs} + D_{hc} \\
+
+\text{Ripple adder sum delay for 1-bit}, D_{rs_1} &= D_{fs} \\
+\text{Ripple adder carry delay for 1-bit}, D_{rc_1} &= D_{fc} \\
+
+\text{Ripple adder sum elay for n-bit}, D_{rs_n} &= D_{rc_{n-1}} + D_{fs} \\
+\text{Ripple adder carry delay for n-bit}, D_{rc_n} &= D_{rc_{n-1}} + D_{fc} \\
+
+\text{Ripple adder overall delay}, D_{r_n} &= D_{rc_{n-1}} + \max(D_{fs}, D_{fc}) \\
+&= D_{rc_{n-1}} + \max(D_{hs}, D_o + D_{hs} + D_{hc}) \\
+&= D_{rc_{n-1}} + D_{fc} \\
+&= n*D_{fc} \\
+&= n*(D_o + D_{hs} + D_{hc}) \\
+&= n*(D_o + 2*D_a + \max(D_o, D_a + D_i))
+\end{align}$$
+
+### Exercise 3.31<a id="Exercise3_31">&nbsp;</a>
+
+By this exercise, we are introduced to the code that is used to create wires and add actions to the wires. The following code is used to add an action to a wire:-
+
+{% highlight scheme %}
+(define (accept-action-procedure! proc)
+      (set! action-procedures 
+            (cons proc action-procedures))
+      (proc))
+{% endhighlight %}
+
+In the given code, the function gets evaluated once after added to the list of `action-procedures`. This initialization is necessary because we require the propogation process to be kick-started with initial values. In the given code, a wire's `signal-value` is set to 0 upon initialization. Thus when an action is added and not run once initially, the action will only be triggered when the `signal-value` is set to 1. Until then, the system would be in an inconsistent state until all wires cycle through a 0 to 1 and back to 0.
+
+To demonstrate this we are tasked with giving the reponse to the half-adder example given in the book if the `(proc)` statement is not called. The following response was seen:-
+
+{% highlight scheme %}
+(probe 'sum sum)
+
+(probe 'carry carry)
+
+(half-adder input-1 input-2 sum carry)
+; ok
+
+(set-signal! input-1 1)
+; done
+
+(propagate)
+; done
+
+(set-signal! input-2 1)
+; done
+
+(propagate)
+; carry 11  New-value = 1
+; done
+{% endhighlight %}
+
+This is mainly due to the inverter in the half-adder. If the signal is not propagated, the default state would be having input and output of 0 which is inconsistent. This causes most of the problems seen. However, after cycling through all possible inputs, the behaviour returns back to normal.
