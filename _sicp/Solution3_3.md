@@ -25,6 +25,7 @@ submenu:
   - { hook: "Exercise3_30", title: "Exercise 3.30" }
   - { hook: "Exercise3_31", title: "Exercise 3.31" }
   - { hook: "Exercise3_32", title: "Exercise 3.32" }
+  - { hook: "Exercise3_33", title: "Exercise 3.33" }
 ---
 
 ### Exercise 3.12<a id="Exercise3_12">&nbsp;</a>
@@ -1117,3 +1118,52 @@ Two events are generated because the change needs to be performed in two steps.
 If the events are executed in the FIFO order, the output temporarily gets set to an intermediate value of 1 and then settles with the correct value of 0. This phenomenon is called a [hazard](https://www.wikiwand.com/en/Hazard_(logic)).
 
 Now, if the events are executed in the LIFO order, we output gets set to 0 first and then to a wrong value of 1. This is because processing the events in the reverse order leads to having an incomplete intermediate state as the final state. Thus, the events for a segment should be executed in FIFO order to get the consistent final output.
+
+### Exercise 3.33<a id="Exercise3_33">&nbsp;</a>
+
+In this exercise, we are tasked with creating a network called `averager` that takes three arguments `a`, `b` and `c` and maintains a constraint where `c` is the average of `b` and `a`. This can be accomplised as follows:-
+
+{% highlight scheme %}
+(define (averager a b c)
+  (let ((total (make-connector))
+        (divisor (make-connector)))
+    (adder a b total)
+    (multiplier divisor c total)
+    (constant 2 divisor)
+    'ok))
+{% endhighlight %}
+
+Let us test the network.
+
+{% highlight scheme %}
+(define a (make-connector))
+(define b (make-connector))
+(define c (make-connector))
+(averager a b c)
+(probe "A" a)
+(probe "B" b)
+(probe "C" c)
+
+(set-value! a 42 'user)
+; Probe: A = 42
+; done
+
+(set-value! b 32 'user)
+; Probe: B = 32
+; Probe: C = 37
+; done
+
+(set-value! c 39 'user)
+; Error! Contradiction (37 39)
+
+(forget-value! b 'user)
+; Probe: B = ?
+; Probe: C = ?
+; done
+
+(set-value! c 39 'user)
+; Probe: C = 39
+; Probe: B = 36
+{% endhighlight %}
+
+As can be seen, correct results are obtained.
