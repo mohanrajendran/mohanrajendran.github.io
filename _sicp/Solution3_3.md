@@ -26,6 +26,9 @@ submenu:
   - { hook: "Exercise3_31", title: "Exercise 3.31" }
   - { hook: "Exercise3_32", title: "Exercise 3.32" }
   - { hook: "Exercise3_33", title: "Exercise 3.33" }
+  - { hook: "Exercise3_34", title: "Exercise 3.34" }
+  - { hook: "Exercise3_35", title: "Exercise 3.35" }
+  - { hook: "Exercise3_36", title: "Exercise 3.36" }
 ---
 
 ### Exercise 3.12<a id="Exercise3_12">&nbsp;</a>
@@ -1167,3 +1170,96 @@ Let us test the network.
 {% endhighlight %}
 
 As can be seen, correct results are obtained.
+
+### Exercise 3.34<a id="Exercise3_34">&nbsp;</a>
+
+In this exercise, we are told that Louis Reasoner builds a squarer using a multiplier using the following code:-
+
+{% highlight scheme %}
+(define (squarer a b) (multiplier a a b))
+{% endhighlight %}
+
+The mistake with this way of doing things is primarily because `multiplier` requires two inputs to compute the other value. Thus, when we set the value of `a`, we can obtain the value of `b` because `a` counts as two inputs to the `multiplier` in question. The reverse would not work because `b` is only one input out of the two required.
+
+The right way to go about it would be to define a new primitive constraint since we can't exactly calculate a square root using a predefined number of adders and multipliers. It takes an iterative method to obtain a square root.
+
+### Exercise 3.35<a id="Exercise3_35">&nbsp;</a>
+
+In this exercise, we are tasked with implementing a proper `squarer` component that maintains $$a^2=b$$. The following code does that:-
+
+{% highlight scheme %}
+(define (squarer a b)
+  (define (process-new-value)
+    (if (has-value? b)
+        (if (< (get-value b) 0)
+            (error "square less than 0: 
+                    SQUARER" 
+                   (get-value b))
+            (set-value! a
+                        (sqrt (get-value b))
+                        me))
+        (if (has-value? a)
+            (set-value! b
+                        (* (get-value a)
+                           (get-value a))
+                    me))))
+  (define (process-forget-value)
+    (forget-value! a me)
+    (forget-value! b me)
+    (process-new-value))
+  (define (me request)
+    (cond ((eq? request 'I-have-a-value)
+           (process-new-value))
+          ((eq? request 'I-lost-my-value)
+           (process-forget-value))
+          (else
+           (error "Unknown request:
+                   SQUARER"
+                  request))))
+  (connect a me)
+  (connect b me)
+  me)
+{% endhighlight %}
+
+Let us test the code:-
+
+{% highlight scheme %}
+(define a (make-connector))
+(define b (make-connector))
+(squarer a b)
+(probe "A" a)
+(probe "B" b)
+
+(set-value! b 5 'user)
+; Probe: B = 5
+; Probe: A = 2.23606797749979
+; done
+
+(forget-value! b 'user)
+; Probe: B = ?
+; Probe: A = ?
+; done
+
+(set-value! a 5 'user)
+; Probe: A = 5
+; Probe: B = 25
+; done
+{% endhighlight %}
+
+The code works as expected.
+
+### Exercise 3.36<a id="Exercise3_36">&nbsp;</a>
+
+In this exercise, we are asked to draw the environment diagram when the the `for-each-except` is called when the following code is evaluated:-
+
+{% highlight scheme %}
+(define a (make-connector))
+(define b (make-connector))
+(set-value! a 10 'user)
+{% endhighlight %}
+
+<center>
+<img src="/images/Ex3_36.svg" alt="for-each-except environment" width="500"/>
+</center>
+
+The above diagram shows the environment. `for-each-except` is executed in environment **E3**.
