@@ -7,6 +7,7 @@ submenu:
   - { hook: "Exercise3_38", title: "Exercise 3.38" }
   - { hook: "Exercise3_39", title: "Exercise 3.39" }
   - { hook: "Exercise3_40", title: "Exercise 3.40" }
+  - { hook: "Exercise3_41", title: "Exercise 3.41" }
 ---
 
 ### Exercise 3.38<a id="Exercise3_38">&nbsp;</a>
@@ -90,3 +91,7 @@ However, if we uses serialized procedures as follows:-
 {% endhighlight %}
 
 We can have $$P_1$$ and $$P_2$$ getting run atomically. Since the operation is commutative, we get 1000000 in both cases.
+
+### Exercise 3.41<a id="Exercise3_41">&nbsp;</a>
+
+In this exercise, Ben Bitdiddle replaces access to balance from `balance` to `(protected (lambda () balance))`. I think that this replacement is not required. This is mainly because accessing `balance` is a single operation. Thus we will not get any other operation interleaving with this access. Furthermore, mutations to `balance` is done using serialized methods and that ensures safe and consistent operations. Only place where interference might occur is when one tries to access `balance` in the middle of `withdraw` and `deposit` operations. This technically is not a faulty operation since we only consider the data to be mutated once these operations are over.
