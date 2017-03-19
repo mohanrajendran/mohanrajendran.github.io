@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 22
 title: Section 3.3 solutions
-exercises: '3.12 - 3.27'
+exercises: '3.12 - 3.37'
 submenu:
   - { hook: "Exercise3_12", title: "Exercise 3.12" }
   - { hook: "Exercise3_13", title: "Exercise 3.13" }
@@ -29,6 +29,7 @@ submenu:
   - { hook: "Exercise3_34", title: "Exercise 3.34" }
   - { hook: "Exercise3_35", title: "Exercise 3.35" }
   - { hook: "Exercise3_36", title: "Exercise 3.36" }
+  - { hook: "Exercise3_37", title: "Exercise 3.37" }
 ---
 
 ### Exercise 3.12<a id="Exercise3_12">&nbsp;</a>
@@ -1259,7 +1260,50 @@ In this exercise, we are asked to draw the environment diagram when the the `for
 {% endhighlight %}
 
 <center>
-<img src="/images/Ex3_36.svg" alt="for-each-except environment" width="500"/>
+<img src="/images/Ex3_36.svg" alt="for-each-except environment"/>
 </center>
 
 The above diagram shows the environment. `for-each-except` is executed in environment **E3**.
+
+### Exercise 3.37<a id="Exercise3_37">&nbsp;</a>
+
+In this exercise, we are required to create a shorthand version of constraints that can create a network as follows:-
+
+{% highlight scheme %}
+(define (celsius-fahrenheit-converter x)
+  (c+ (c* (c/ (cv 9) (cv 5))
+          x)
+      (cv 32)))
+
+(define C (make-connector))
+(define F (celsius-fahrenheit-converter C))
+{% endhighlight %}
+
+Such constraint functions are as follows:-
+
+{% highlight scheme %}
+(define (c+ x y)
+  (let ((z (make-connector)))
+    (adder x y z)
+    z))
+
+(define (c- x y)
+  (let ((z (make-connector)))
+    (adder y z x)
+    z))
+
+(define (c* x y)
+  (let ((z (make-connector)))
+    (multiplier x y z)
+    z))
+
+(define (c/ x y)
+  (let ((z (make-connector)))
+    (multiplier y z x)
+    z))
+
+(define (cv x)
+  (let ((z (make-connector)))
+    (constant x z)
+    z))
+{% endhighlight %}
