@@ -6,6 +6,7 @@ exercises: '3.38 - 3.39'
 submenu:
   - { hook: "Exercise3_38", title: "Exercise 3.38" }
   - { hook: "Exercise3_39", title: "Exercise 3.39" }
+  - { hook: "Exercise3_40", title: "Exercise 3.40" }
 ---
 
 ### Exercise 3.38<a id="Exercise3_38">&nbsp;</a>
@@ -32,7 +33,7 @@ If the individual processes can be interleaved, many different values can be pro
 The above ordering can produce a final value of 80.
 
 ![Possibility 2](/images/Ex3_38_Part2.svg)
-
+-
 The above ordering can produce a final value of 110. These examples show us the importance of concurrency management.
 
 ### Exercise 3.39<a id="Exercise3_39">&nbsp;</a>
@@ -61,3 +62,31 @@ Since step **2** is dependant of **1** being complete, and **2** can interleave 
 * Steps 1, 3, 2 in order :- 10 -> 11 -> 100
 * Step 1 first then Step 3 with Step 2 interleaved :- 10 -> 100 -> 11
 
+### Exercise 3.40<a id="Exercise3_40">&nbsp;</a>
+
+In this exercise, we are asked for possible values when the following code is evaluated:-
+
+{% highlight scheme %}
+(define x 10)
+(parallel-execute 
+ (lambda () (set! x (* x x)))
+ (lambda () (set! x (* x x x))))
+{% endhighlight %}
+
+* 100 :- $$P_1$$ calculates 100, $$P_2$$ calculates 1000 and stores, $$P_1$$ stores 100
+* 1000 :- $$P_2$$ calculates 1000, $$P_1$$ calculates 100 and stores, $$P_2$$ stores 1000
+* 10000 :- $$P_1$$ reads first x as 10, $$P_2$$ calculates 1000 and stores, $$P_1$$ reads second x as 1000 and stores 10000
+* 100000 :- $$P_2$$ reads first x as 10, $$P_1$$ calculates 100 and stores, $$P_2$$ reads second and third x as 100 and stores 100000
+* 1000000 :- $$P_1$$ calculates 100 and stores, $$P_2$$ calculates 1000000 and stores
+
+However, if we uses serialized procedures as follows:-
+
+{% highlight scheme %}
+(define x 10)
+(define s (make-serializer))
+(parallel-execute 
+ (s (lambda () (set! x (* x x))))
+ (s (lambda () (set! x (* x x x)))))
+{% endhighlight %}
+
+We can have $$P_1$$ and $$P_2$$ getting run atomically. Since the operation is commutative, we get 1000000 in both cases.
