@@ -10,9 +10,6 @@ tagline:             'Personal Website'
 description:         'Personal Website'
 url:                 mohanrajendran.com
 baseurl:             /
-excerpt_separator:   <!--excerpt-->
-paginate:            5
-gems:                [jekyll-paginate]
 
 # About/contact
 author:

@@ -148,9 +148,13 @@ abbr[title] {
 }
 
 /* Code */
+@font-face {
+  font-family: FiraCodeRetina;
+  src: url(../FiraCode-Retina.ttf)
+}
 code,
 pre {
-  font-family: Menlo, Monaco, "Courier New", monospace;
+  font-family: FiraCodeRetina, Menlo, Monaco, "Courier New", monospace;
 }
 code {
   padding: .25em .5em;
