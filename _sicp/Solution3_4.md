@@ -12,6 +12,7 @@ submenu:
   - { hook: "Exercise3_43", title: "Exercise 3.43" }
   - { hook: "Exercise3_44", title: "Exercise 3.44" }
   - { hook: "Exercise3_45", title: "Exercise 3.45" }
+  - { hook: "Exercise3_46", title: "Exercise 3.46" }
 ---
 
 ### Exercise 3.38<a id="Exercise3_38">&nbsp;</a>
@@ -207,3 +208,24 @@ The issue with this code is that when a combined transaction needs to perform `d
 {% endhighlight %}
 
 In this case, since the overall call to `exchange` is serialized with `serializer1` and `serializer2`, the internal calls would not be able to call `withdraw` and `deposit` since they require the serializers again. Thus, the call would have a [deadlock](https://en.wikipedia.org/wiki/Deadlock).
+
+### Exercise 3.46<a id="Exercise3_46">&nbsp;</a>
+
+In this exercise, we are asked what happens if the given `test-and-set!` process is not run atomically.
+
+{% highlight scheme %}
+(define (test-and-set! cell)
+  (if (car cell)
+      true
+      (begin (set-car! cell true)
+             false)))
+{% endhighlight %}
+
+The main risk in the above code is when two processes concurrently try to obtain a lock and there is interleaving between test and set. Let us see how this happens. Assume processes $$P_1$$ and $$P_2$$ try to obtain a lock at the same time.
+
+- $$P_1$$ calls `(car cell)` and recieves `#f`
+- $$P_2$$ also calls `(car cell)` and recieves `#f`
+- $$P_1$$ sets `cell` to `#t` and returns `#f`
+- $$P_2$$ also sets `cell` to `#t` and returns `#f`
+
+Since there is a break between when the cell is tested and when a lock is actually set, both processes acquire a lock. Thus, it is esssential that `test-and-set!` be atomic.
