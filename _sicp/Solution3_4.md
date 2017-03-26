@@ -10,6 +10,8 @@ submenu:
   - { hook: "Exercise3_41", title: "Exercise 3.41" }
   - { hook: "Exercise3_42", title: "Exercise 3.42" }
   - { hook: "Exercise3_43", title: "Exercise 3.43" }
+  - { hook: "Exercise3_44", title: "Exercise 3.44" }
+  - { hook: "Exercise3_45", title: "Exercise 3.45" }
 ---
 
 ### Exercise 3.38<a id="Exercise3_38">&nbsp;</a>
@@ -137,4 +139,71 @@ we preserve the right balances because all involved accounts are serialized for 
 
 ![Exchange race condition](/images/Ex3_43.svg)
 
-Though, we should end with 20/30/10, we end up with 20/20/20. This is because by the time actual swap is conducted, the amount to swap would not be valid anymore. However, since the amount withdrawn and deposited in any step is equal and each sub-operation is serialized, the total amount of balance would still be maintained.
+Though, we should end with 20/30/10, we end up with 20/20/20. This is because by the time actual swap is conducted, the `difference` amount to swap would not be valid anymore. However, since the amount withdrawn and deposited in any step is equal and each sub-operation is serialized, the total amount of balance would still be maintained.
+
+### Exercise 3.44<a id="Exercise3_44">&nbsp;</a>
+
+In this exercise, we are given the following code to transfer amounts between accounts:-
+
+{% highlight scheme %}
+(define 
+  (transfer from-account to-account amount)
+  ((from-account 'withdraw) amount)
+  ((to-account 'deposit) amount))
+{% endhighlight %}
+
+Ben Bitdiddle calins that the procedure works when many people transfer money concurrently and Louis Reasoner claims otherwise. I would agree with Ben. Since `withdraw` and `deposit` are serialized, there should not be any inconsistencies. Furthermore, the actual `amount` to transfer is held the same across withdrawal and deposit. This means that the intended effect is obtained.
+
+A key difference between this and the previous exercise is that the value of `difference` migh be invalid before the transfer ever takes place. In this case, we are explicitly given the transfer amount. Thus no concurrency issues would arise.
+
+### Exercise 3.45<a id="Exercise3_45">&nbsp;</a>
+
+In this exercise, we are given a new version of `make-account-and-serializer` from Louis that serializes `withdraw` and `deposit` internally as well as exposes a serializer for use in transactions involving multiple accounts.
+
+{% highlight scheme %}
+(define 
+  (make-account-and-serializer balance)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance 
+                     (- balance amount))
+               balance)
+        "Insufficient funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (let ((balance-serializer 
+         (make-serializer)))
+    (define (dispatch m)
+      (cond ((eq? m 'withdraw) 
+             (balance-serializer withdraw))
+            ((eq? m 'deposit) 
+             (balance-serializer deposit))
+            ((eq? m 'balance) 
+             balance)
+            ((eq? m 'serializer) 
+             balance-serializer)
+            (else (error "Unknown request: 
+                          MAKE-ACCOUNT"
+                         m))))
+    dispatch))
+{% endhighlight %}
+
+The issue with this code is that when a combined transaction needs to perform `deposit` or `withdraw`, it would be locked out since the overall transaction would already have acquired the locks. For example, let us look at the `serialized-exhange` code again:-
+
+{% highlight scheme %}
+(define (exchange account1 account2)
+  (let ((difference (- (account1 'balance)
+                       (account2 'balance))))
+    ((account1 'withdraw) difference)
+    ((account2 'deposit) difference)))
+
+(define (serialized-exchange account1 account2)
+  (let ((serializer1 (account1 'serializer))
+        (serializer2 (account2 'serializer)))
+    ((serializer1 (serializer2 exchange))
+     account1
+     account2)))
+{% endhighlight %}
+
+In this case, since the overall call to `exchange` is serialized with `serializer1` and `serializer2`, the internal calls would not be able to call `withdraw` and `deposit` since they require the serializers again. Thus, the call would have a [deadlock](https://en.wikipedia.org/wiki/Deadlock).
