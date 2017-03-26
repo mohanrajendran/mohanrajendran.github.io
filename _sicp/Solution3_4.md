@@ -9,6 +9,7 @@ submenu:
   - { hook: "Exercise3_40", title: "Exercise 3.40" }
   - { hook: "Exercise3_41", title: "Exercise 3.41" }
   - { hook: "Exercise3_42", title: "Exercise 3.42" }
+  - { hook: "Exercise3_43", title: "Exercise 3.43" }
 ---
 
 ### Exercise 3.38<a id="Exercise3_38">&nbsp;</a>
@@ -100,3 +101,40 @@ In this exercise, Ben Bitdiddle replaces access to balance from `balance` to `(p
 ### Exercise 3.42<a id="Exercise3_42">&nbsp;</a>
 
 In this exercise, we have another change by Ben Bitdiddle, he changes `make-account` so that `dispatch` returns pre-protected functions instead of protecting function each time its accessed. This is a valid change since protection only comes into play when executing. When the protection is applied is immaterial.
+
+### Exercise 3.43<a id="Exercise3_43">&nbsp;</a>
+
+In this exercise, we talk about exchanging balances between three accounts. Let us use the following code as an example:-
+
+{% highlight scheme %}
+(define (exchange account1 account2)
+  (let ((difference (- (account1 'balance)
+                       (account2 'balance))))
+    ((account1 'withdraw) difference)
+    ((account2 'deposit) difference)))
+
+(define a (make-account 10))
+(define b (make-account 20))
+(define c (make-account 30))
+
+(parallel-execute
+  (exchange a b)
+  (exchange b c))
+{% endhighlight %}
+
+If we use the given code as follows and replace `exchange` above with `serialized-exchange` below:-
+
+{% highlight scheme %}
+(define (serialized-exchange account1 account2)
+  (let ((serializer1 (account1 'serializer))
+        (serializer2 (account2 'serializer)))
+    ((serializer1 (serializer2 exchange))
+     account1
+     account2)))
+{% endhighlight %}
+
+we preserve the right balances because all involved accounts are serialized for the duration of exchange. No other process involving either account can be run while `serialized-exchange` being run. However, if we use the original `exchange` function, we obviously will get errors because execution can be interleaved between when a balance is computed and when balance is swapped. Let us demonstrate this by using the following diagram:-
+
+![Exchange race condition](/images/Ex3_43.svg)
+
+Though, we should end with 20/30/10, we end up with 20/20/20. This is because by the time actual swap is conducted, the amount to swap would not be valid anymore. However, since the amount withdrawn and deposited in any step is equal and each sub-operation is serialized, the total amount of balance would still be maintained.
