@@ -13,6 +13,7 @@ submenu:
   - { hook: "Exercise3_44", title: "Exercise 3.44" }
   - { hook: "Exercise3_45", title: "Exercise 3.45" }
   - { hook: "Exercise3_46", title: "Exercise 3.46" }
+  - { hook: "Exercise3_47", title: "Exercise 3.47" }
 ---
 
 ### Exercise 3.38<a id="Exercise3_38">&nbsp;</a>
@@ -229,3 +230,59 @@ The main risk in the above code is when two processes concurrently try to obtain
 - $$P_2$$ also sets `cell` to `#t` and returns `#f`
 
 Since there is a break between when the cell is tested and when a lock is actually set, both processes acquire a lock. Thus, it is esssential that `test-and-set!` be atomic.
+
+### Exercise 3.47<a id="Exercise3_47">&nbsp;</a>
+
+In this exercise, we are tasked with implementing [semaphores](https://en.wikipedia.org/wiki/Semaphore_(programming)) of size *n*.
+
+#### In terms of mutexes
+
+To implement semaphores in terms of mutexes, we simply create a structure that maintains the number of processes that can still acquire the semaphore currently. Then, we can use a built-in `mutex` to test and set the count accordingly. If the count is 0, then the semaphore needs to re-acquire just like how we retry for mutex. The following code demonstrates this.
+
+{% highlight scheme %}
+(define (make-semaphore n)
+  (let ((mutex (make-mutex))
+        (count n))
+    (define (the-semaphore m)
+      (cond ((eq? m 'acquire)
+             (mutex 'acquire)
+             (if (> count 0)
+                 (begin (set! count (- count 1))
+                        (mutex 'release))
+                 (begin (mutex 'release)
+                        (the-semaphore 'acquire)))) ; retry
+            ((eq? m 'release)
+             (mutex 'acquire)
+             (if (= count n)
+                 (mutex 'release)
+                 (begin (set! count (+ count 1))
+                        (mutex 'release))))))
+    the-semaphore))
+{% endhighlight %}
+
+#### In terms of `test-and-set!` opeerations
+
+To implement semaphores in terms of `test-and-set!` operations, we can simply replace `mutex` above with `test-and-set!`. In this case, the retry part of mutex would also need to be implemented. The following code is the implementation.
+
+{% highlight scheme %}
+(define (make-semaphore n)
+  (let ((cell (list false))
+        (count n))
+    (define (the-semaphore m)
+      (cond ((eq? m 'acquire)
+             (if (test-and-set! cell)
+                 (the-semaphore 'acquire) ; retry
+                 (if (> count 0)
+                     (begin (set! count (- count 1))
+                            (clear! cell))
+                     (begin (clear! cell)
+                            (the-semaphore 'acquire))))) ; retry
+            ((eq? m 'release)
+             (if (test-and-set! cell)
+                 (the-semaphore 'release) ; retry
+                 (if (= count n)
+                     (clear! cell)
+                     (begin (set! count (+ count 1))
+                            (clear! cell)))))))
+    the-semaphore))
+{% endhighlight %}
