@@ -14,6 +14,7 @@ submenu:
   - { hook: "Exercise3_45", title: "Exercise 3.45" }
   - { hook: "Exercise3_46", title: "Exercise 3.46" }
   - { hook: "Exercise3_47", title: "Exercise 3.47" }
+  - { hook: "Exercise3_48", title: "Exercise 3.48" }
 ---
 
 ### Exercise 3.38<a id="Exercise3_38">&nbsp;</a>
@@ -285,4 +286,57 @@ To implement semaphores in terms of `test-and-set!` operations, we can simply re
                      (begin (set! count (+ count 1))
                             (clear! cell)))))))
     the-semaphore))
+{% endhighlight %}
+
+### Exercise 3.48<a id="Exercise3_48">&nbsp;</a>
+
+In this exercise, we are presented with a method for deadlock avoidance. The accounts are numbered and the locks are acquired in order of the account number. This avoids deadlock because all processes acquire locks in the same order. This prevents the case where two concurrent processes are waiting for the other process to release a lock to proceed. The process to obtain the first lock is able to acquire all other locks. The `serialized-exchange` incorporating this idea is as follows:-
+
+{% highlight scheme %}
+(define next-id 0)
+
+(define (make-account-and-serializer balance)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin 
+          (set! balance (- balance amount))
+          balance)
+        "Insufficient funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define id next-id)
+  (set! next-id (+ next-id 1))
+  (let ((balance-serializer 
+         (make-serializer)))
+    (define (dispatch m)
+      (cond ((eq? m 'withdraw) withdraw)
+            ((eq? m 'deposit) deposit)
+            ((eq? m 'balance) balance)
+            ((eq? m 'serializer) 
+             balance-serializer)
+            ((eq? m 'id) id)
+            (else (error "Unknown request: 
+                          MAKE-ACCOUNT"
+                         m))))
+    dispatch))
+
+(define (exchange account1 account2)
+  (let ((difference (- (account1 'balance)
+                       (account2 'balance))))
+    ((account1 'withdraw) difference)
+    ((account2 'deposit) difference)))
+
+(define (serialized-exchange account1 account2)
+  (let ((serializer1 (account1 'serializer))
+        (serializer2 (account2 'serializer))
+        (id1 (account1 'id))
+        (id2 (account2 'id)))
+    (if (< id1 id2)
+        ((serializer1 (serializer2 exchange))
+         account1
+         account2)
+        ((serializer2 (serializer1 exchange))
+         account1
+         account2)))
 {% endhighlight %}
