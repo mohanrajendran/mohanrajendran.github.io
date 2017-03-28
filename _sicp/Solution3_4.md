@@ -15,6 +15,7 @@ submenu:
   - { hook: "Exercise3_46", title: "Exercise 3.46" }
   - { hook: "Exercise3_47", title: "Exercise 3.47" }
   - { hook: "Exercise3_48", title: "Exercise 3.48" }
+  - { hook: "Exercise3_49", title: "Exercise 3.49" }
 ---
 
 ### Exercise 3.38<a id="Exercise3_38">&nbsp;</a>
@@ -340,3 +341,9 @@ In this exercise, we are presented with a method for deadlock avoidance. The acc
          account1
          account2)))
 {% endhighlight %}
+
+This problem is famously called the [Dining Philosophers problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem) and this solution was proposed by Edgar Djikstra.
+
+### Exercise 3.49<a id="Exercise3_49">&nbsp;</a>
+
+One place where the solution presented would fail is when the resources required are not known in advance. An example would be in case of database mutations where we can have a complex query which needs to find out the row to mutate by reading another row first. In this case, the database cannot know in advance which locks to obtain. Thus, there might be a chance for deadlock to occur.
