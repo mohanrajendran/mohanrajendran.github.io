@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 24
 title: Section 3.4 solutions
-exercises: '3.38 - 3.42'
+exercises: '3.38 - 3.49'
 submenu:
   - { hook: "Exercise3_38", title: "Exercise 3.38" }
   - { hook: "Exercise3_39", title: "Exercise 3.39" }
