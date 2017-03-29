@@ -11,9 +11,18 @@ submenu:
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
 
 {% highlight scheme %}
+(define (memo-proc proc)
+  (let ((already-run? false) (result false))
+    (lambda ()
+      (if (not already-run?)
+          (begin (set! result (proc))
+                 (set! already-run? true)
+                 result)
+          result))))
+
 (define-syntax delay
   (syntax-rules ()
-    ((_ exp) (lambda () exp))))
+    ((_ exp) (memo-proc (lambda () exp)))))
 
 (define (force delayed-object)
   (delayed-object))
@@ -27,6 +36,11 @@ In this section, we are introduced to streams. Implementation of streams require
 
 (define (stream-cdr stream)
   (force (cdr stream)))
+
+(define the-empty-stream '())
+
+(define (stream-null? stream)
+  (null? stream))
 {% endhighlight %}
 
 ### Exercise 3.50<a id="Exercise3_50">&nbsp;</a>
