@@ -2,13 +2,14 @@
 layout: spiedpage
 order: 26
 title: Section 3.5 solutions
-exercises: '3.50 - 3.54'
+exercises: '3.50 - 3.55'
 submenu:
   - { hook: "Exercise3_50", title: "Exercise 3.50" }
   - { hook: "Exercise3_51", title: "Exercise 3.51" }
   - { hook: "Exercise3_52", title: "Exercise 3.52" }
   - { hook: "Exercise3_53", title: "Exercise 3.53" }
   - { hook: "Exercise3_54", title: "Exercise 3.54" }
+  - { hook: "Exercise3_55", title: "Exercise 3.55" }
 ---
 
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
@@ -195,4 +196,15 @@ We can then define `factorials` stream using the following code:-
 
 (define factorials
   (cons-stream 1 (mul-streams factorials integers)))
+{% endhighlight %}
+
+### Exercise 3.55<a id="Exercise3_55">&nbsp;</a>
+
+In this exercise, we are asked to define `partial-sums`, a function that takes in a stream $$S$$ and outputs $$S_0, S_0+S_1, S_0+S_1+S_2,...$$. The function can be defined as follows:-
+
+{% highlight scheme %}
+(define (partial-sums s)
+  (cons-stream (stream-car s)
+               (stream-map (lambda (x) (+ x (stream-car s)))
+                           (partial-sums (stream-cdr s)))))
 {% endhighlight %}
