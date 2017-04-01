@@ -1,13 +1,14 @@
-
 ---
 layout: spiedpage
 order: 26
 title: Section 3.5 solutions
-exercises: '3.50 - 3.51'
+exercises: '3.50 - 3.54'
 submenu:
   - { hook: "Exercise3_50", title: "Exercise 3.50" }
   - { hook: "Exercise3_51", title: "Exercise 3.51" }
   - { hook: "Exercise3_52", title: "Exercise 3.52" }
+  - { hook: "Exercise3_53", title: "Exercise 3.53" }
+  - { hook: "Exercise3_54", title: "Exercise 3.54" }
 ---
 
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
@@ -152,3 +153,46 @@ At the end of this call, `sum` holds the value of *136* which is the 7th event v
 At the end of this call, `sum` holds the value of *210*. This is because `display-stream` goes through all of `seq`. Thus the final value is $$1+...+20=210$$.
 
 If the `delay` function has not been memoized, we will get different values in this case. This is because of the side-effect in the function given to `stream-map`. Each time the stream is used, the value of `sum` would have mutated and it would be hard to predict the value. By memoization, we restrict the side effect to only the first time the stream is resolved.
+
+### Exercise 3.53<a id="Exercise3_53">&nbsp;</a>
+
+In this exercise, we are asked to describe the elements of the stream defined as follows:-
+
+{% highlight scheme %}
+(define s (cons-stream 1 (add-streams s s)))
+{% endhighlight %}
+
+The first element is obviously *1* as defined. The second element is the sum of first element with itself. Thus it is *2*. The third element would be the sum of the second element with itself. It will be *4*. In essense, we get $$1 2 4 8 16 32 64 ...$$. Another way to look at it would be through the following code transformation:-
+
+{% highlight scheme %}
+(define s (cons-stream 1 (add-streams s s)))
+
+(define s (cons-stream 1 (stream-map (lambda (x) (* 2 x)) s)))
+
+(define s (cons-stream 1 (scale-stream s 2)))
+
+double
+{% endhighlight %}
+
+As can be seen, the given stream is the same as the one already given in the book which gives the same value.
+
+### Exercise 3.54<a id="Exercise3_54">&nbsp;</a>
+
+In this exercise, we are taked with defining a stream for calculating factorial using `mul-streams` function. The code to do so is as follows:-
+
+{% highlight scheme %}
+(define (mul-streams s1 s2) 
+  (stream-map * s1 s2))
+{% endhighlight %}
+
+We can then define `factorials` stream using the following code:-
+
+{% highlight scheme %}
+(define (integers-starting-from n)
+  (cons-stream 
+   n (integers-starting-from (+ n 1))))
+(define integers (integers-starting-from 1))
+
+(define factorials
+  (cons-stream 1 (mul-streams factorials integers)))
+{% endhighlight %}
