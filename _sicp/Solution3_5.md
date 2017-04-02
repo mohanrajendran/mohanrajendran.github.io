@@ -342,10 +342,12 @@ In this exercise, we are tasked with writing a function that computes the invers
 
 {% highlight scheme %}
 (define (invert-unit-series series)
-  (cons-stream 1
-               (scale-stream (mul-series (stream-cdr series)
-                                         (invert-unit-series series))
-                             -1)))
+  (define inverted
+    (cons-stream 1
+                 (scale-stream (mul-series (stream-cdr series)
+                                           inverted)
+                               -1)))
+  inverted)
 {% endhighlight %}
 
 ### Exercise 3.62<a id="Exercise3_62">&nbsp;</a>
@@ -356,8 +358,37 @@ In this exercise, we are tasked with creating `div-series` which divides two pow
 (define (div-series num-series den-series)
   (let ((divisor (stream-car den-series)))
     (if (= divisor 0)
-        (display "Cannot divide denominator with 0 constant term")
+        (error "Cannot divide denominator with 0 constant term")
         (mul-series (invert-unit-series (scale-stream den-series
                                                       (/ 1 divisor)))
                     num-series))))
+{% endhighlight %}
+
+### Exercise 3.63<a id="Exercise3_63">&nbsp;</a>
+
+In this exercise, we are given the following modified version for `sqrt-stream`:-
+
+{% highlight scheme %}
+(define (sqrt-stream x)
+  (cons-stream 
+   1.0
+   (stream-map (lambda (guess)
+                 (sqrt-improve guess x))
+               (sqrt-stream x))))
+{% endhighlight %}
+
+The reason is that each recursive call of `(sqrt-stream x)` constructs a new stream. This means extracting value from this stream would take fresh computations. This is exactly what would happen if we did not memoize `delay`.
+
+### Exercise 3.64<a id="Exercise3_64">&nbsp;</a>
+
+In this exercise, we are tasked with implementing `stream-limit` which takes a stream and a tolerance number. The function then examines the stream until it finds two successive elements which differ by less than tolerance and return the second number. It can be implemented as follows:-
+
+{% highlight scheme %}
+(define (stream-limit s tol)
+  (let ((s0 (stream-ref s 0))
+        (s1 (stream-ref s 1)))
+    (if (< (abs (- s1 s0))
+           tol)
+        s1
+        (stream-limit (stream-cdr s) tol))))
 {% endhighlight %}
