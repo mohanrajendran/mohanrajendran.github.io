@@ -17,6 +17,9 @@ submenu:
   - { hook: "Exercise3_60", title: "Exercise 3.60" }
   - { hook: "Exercise3_61", title: "Exercise 3.61" }
   - { hook: "Exercise3_62", title: "Exercise 3.62" }
+  - { hook: "Exercise3_63", title: "Exercise 3.63" }
+  - { hook: "Exercise3_64", title: "Exercise 3.64" }
+  - { hook: "Exercise3_65", title: "Exercise 3.65" }
 ---
 
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
@@ -392,3 +395,60 @@ In this exercise, we are tasked with implementing `stream-limit` which takes a s
         s1
         (stream-limit (stream-cdr s) tol))))
 {% endhighlight %}
+
+### Exercise 3.65<a id="Exercise3_65">&nbsp;</a>
+
+In this exercise, we are tasked with creating a stream to compute $$ln2 = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + ...$$. Then, we apply [Euler's series acceleration transformation](https://www.wikiwand.com/en/Series_acceleration#/Euler.27s_transform) to examine the convergence characteristics. The `ln2-stream` can be defined as follows:-
+
+{% highlight scheme %}
+(define (ln2-summands n)
+        (cons-stream
+         (/ 1.0 n) 
+         (stream-map - (ln2-summands (+ n 1)))))
+
+(define ln2-stream
+        (partial-sums (ln2-summands 1)))
+{% endhighlight %}
+
+Taking into account $$ln2=0.69314718056$$, let us examine the convergences,
+
+{% highlight scheme %}
+(display-stream ln2-stream)
+; 1.0
+; 0.5
+; 0.8333333333333333
+; 0.5833333333333333
+; 0.7833333333333333
+; 0.6166666666666667
+; 0.7595238095238095
+; 0.6345238095238095
+; 0.7456349206349207
+; 0.6456349206349206
+; ...
+
+(display-stream (euler-transform ln2-stream))
+; 0.7
+; 0.6904761904761905
+; 0.6944444444444444
+; 0.6924242424242424
+; 0.6935897435897436
+; 0.6928571428571428
+; 0.6933473389355742
+; 0.6930033416875522
+; 0.6932539682539682
+; 0.6930657506744463
+
+(display-stream (accelerated-sequence euler-transform ln2-stream))
+; 1.0
+; 0.7
+; 0.6932773109243697
+; 0.6931488693329254
+; 0.6931471960735491
+; 0.6931471806635636
+; 0.6931471805604038
+; 0.6931471805599444
+; 0.6931471805599426
+; 0.6931471805599453
+{% endhighlight %}
+
+As can be seen, recursive acceleration provides the best convergence.
