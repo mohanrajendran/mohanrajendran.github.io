@@ -10,6 +10,7 @@ submenu:
   - { hook: "Exercise3_53", title: "Exercise 3.53" }
   - { hook: "Exercise3_54", title: "Exercise 3.54" }
   - { hook: "Exercise3_55", title: "Exercise 3.55" }
+  - { hook: "Exercise3_56", title: "Exercise 3.56" }
 ---
 
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
@@ -207,4 +208,38 @@ In this exercise, we are asked to define `partial-sums`, a function that takes i
   (cons-stream (stream-car s)
                (stream-map (lambda (x) (+ x (stream-car s)))
                            (partial-sums (stream-cdr s)))))
+{% endhighlight %}
+
+### Exercise 3.56<a id="Exercise3_56">&nbsp;</a>
+
+In this exercise, we are aked to define `S` which is a stream of numbers beginning with *1* and contains numbers whose multiples are *2*, *3* and *5*. We are given a hint that `(scale-stream S 2)`, `(scale-stream S 3)` and `(scale-stream S 5)` also belongs in `S`. Given this and a merge function, `S` can be defined as follows:-
+
+{% highlight scheme %}
+(define (merge s1 s2)
+  (cond ((stream-null? s1) s2)
+        ((stream-null? s2) s1)
+        (else
+         (let ((s1car (stream-car s1))
+               (s2car (stream-car s2)))
+           (cond ((< s1car s2car)
+                  (cons-stream 
+                   s1car 
+                   (merge (stream-cdr s1) 
+                          s2)))
+                 ((> s1car s2car)
+                  (cons-stream 
+                   s2car 
+                   (merge s1 
+                          (stream-cdr s2))))
+                 (else
+                  (cons-stream 
+                   s1car
+                   (merge 
+                    (stream-cdr s1)
+                    (stream-cdr s2)))))))))
+
+(define S
+  (cons-stream 1
+               (merge (merge (scale-stream S 2) (scale-stream S 3))
+                      (scale-stream S 5))))
 {% endhighlight %}
