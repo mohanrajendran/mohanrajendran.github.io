@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 26
 title: Section 3.5 solutions
-exercises: '3.50 - 3.55'
+exercises: '3.50 - 3.62'
 submenu:
   - { hook: "Exercise3_50", title: "Exercise 3.50" }
   - { hook: "Exercise3_51", title: "Exercise 3.51" }
@@ -11,6 +11,12 @@ submenu:
   - { hook: "Exercise3_54", title: "Exercise 3.54" }
   - { hook: "Exercise3_55", title: "Exercise 3.55" }
   - { hook: "Exercise3_56", title: "Exercise 3.56" }
+  - { hook: "Exercise3_57", title: "Exercise 3.57" }
+  - { hook: "Exercise3_58", title: "Exercise 3.58" }
+  - { hook: "Exercise3_59", title: "Exercise 3.59" }
+  - { hook: "Exercise3_60", title: "Exercise 3.60" }
+  - { hook: "Exercise3_61", title: "Exercise 3.61" }
+  - { hook: "Exercise3_62", title: "Exercise 3.62" }
 ---
 
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
@@ -242,4 +248,116 @@ In this exercise, we are aked to define `S` which is a stream of numbers beginni
   (cons-stream 1
                (merge (merge (scale-stream S 2) (scale-stream S 3))
                       (scale-stream S 5))))
+{% endhighlight %}
+
+### Exercise 3.57<a id="Exercise3_57">&nbsp;</a>
+
+In this task, we asked for the number of additions performed when $$n^{th}$$ fibonacci number is calculated by the given `fibs` stream. Since the `dela` function is memoized, the time taken for calculating `fibs` is $$O(n)$$ since all *n-1* terms required for its computation has already been computed and can be recovered in $$O(1)$$ time. Now, if the streams is not memoized, as calculated in Chapter 1, we take $$O(fib(n))$$ time to calculate.
+
+### Exercise 3.58<a id="Exercise3_58">&nbsp;</a>
+
+In this exercise, we are given the following stream:-
+
+{% highlight scheme %}
+(define (expand num den radix)
+  (cons-stream
+   (quotient (* num radix) den)
+   (expand (remainder (* num radix) den) 
+           den 
+           radix)))
+{% endhighlight %}
+
+When we call `(expand 1 7 10)`, we get the following:-
+
+{% highlight scheme %}
+(expand 1 7 10)
+(cons-stream 1 (expand 3 7 10))
+(cons 1 (cons-stream 4 (expand 2 7 10)))
+(cons 1 (cons 4 (cons-stream 2 (expand 6 7 10))))
+...
+; 1 4 2 8 5 7 1 4 2 8
+{% endhighlight %}
+
+Next, when we call `(expand 3 8 10)`, we get the following:-
+
+{% highlight scheme %}
+(expand 3 8 10)
+(cons-stream 3 (expand 6 8 10))
+(cons 3 (cons-stream 7 (expand 4 8 10)))
+(cons 3 (cons 7 (cons-stream 5 (expand 0 8 10))))
+...
+; 3 7 5 0 0 0 0 0 0
+{% endhighlight %}
+
+In essence, this stream performs [long division](https://www.wikiwand.com/en/Long_division) to calculate $$\text{num}/\text{den}$$ with the given radix or base.
+
+### Exercise 3.59<a id="Exercise3_59">&nbsp;</a>
+
+In this exercise, we are tasked wtih creating a procedure `integrate-series` which takes as input a stream $$a_0$$, $$a_1$$, $$a_2$$,... which denotes a polynomial $$a_0+a_1x+a_2x^2+...$$ and gives its stream which denotes its integrated polynomial without the constant term, $$a_0x+\frac{1}{2}a_1x^2+\frac{1}{3}a_2x^3+...$$ as a stream $$a_0$$, $$\frac{1}{2}a_1$$, $$\frac{1}{3}a_2$$,... . First, let us define `integrate-series` as following:-
+
+{% highlight scheme %}
+(define (integrate-series series)
+  (define (integrate-helper s divisor)
+    (cons-stream (/ (stream-car s) divisor)
+                 (integrate-helper (stream-cdr s) (+ divisor 1))))
+  (integrate-helper series 1))
+{% endhighlight %}
+
+Next, we need to define `cosine-series` and `sine-series` using this function. It can be done as follows:-
+
+{% highlight scheme %}
+(define cosine-series
+  (cons-stream 1 (scale-stream (integrate-series sine-series)
+                               -1)))
+
+(define sine-series
+  (cons-stream 0 (integrate-series cosine-series)))
+{% endhighlight %}
+
+The series are defined using [mutual recursion](https://www.wikiwand.com/en/Mutual_recursion). As more terms are needed, the counterpart generates enough terms.
+
+### Exercise 3.60<a id="Exercise3_60">&nbsp;</a>
+
+In this exercise, we are tasked with writing a `mul-series` function that multiplies two series streams as defined in the above exercise. It can be done as follows:-
+
+{% highlight scheme %}
+(define (mul-series s1 s2)
+  (cons-stream (* (stream-car s1) (stream-car s2))
+               (add-streams (scale-stream (stream-cdr s2)
+                                          (stream-car s1))
+                            (mul-series s2
+                                        (stream-cdr s1)))))
+{% endhighlight %}
+
+We are basically calculating 
+
+$$\begin{align}
+(a_0 + a_{rest})*(b_0 + b_{rest}) &= (a_0 * b_0) + (a_0 * b_{rest}) + (a_{rest} * b_0) + (a_{rest} * b_{rest}) 
+\\&= (a_0 * b_0) + (a_0 * b_{rest}) + (a_{rest} * b)
+\end{align}$$
+
+### Exercise 3.61<a id="Exercise3_61">&nbsp;</a>
+
+In this exercise, we are tasked with writing a function that computes the inverse of a series. It can be done as follows:-
+
+{% highlight scheme %}
+(define (invert-unit-series series)
+  (cons-stream 1
+               (scale-stream (mul-series (stream-cdr series)
+                                         (invert-unit-series series))
+                             -1)))
+{% endhighlight %}
+
+### Exercise 3.62<a id="Exercise3_62">&nbsp;</a>
+
+In this exercise, we are tasked with creating `div-series` which divides two power series. It should work for all denominators with non-zero constant. We can go about it as follows:-
+
+{% highlight scheme %}
+(define (div-series num-series den-series)
+  (let ((divisor (stream-car den-series)))
+    (if (= divisor 0)
+        (display "Cannot divide denominator with 0 constant term")
+        (mul-series (invert-unit-series (scale-stream den-series
+                                                      (/ 1 divisor)))
+                    num-series))))
 {% endhighlight %}
