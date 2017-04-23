@@ -548,3 +548,70 @@ In this exercise, we are tasked with defining a stream `triples` that produces a
                       (square (caddr x))))
                  (triples integers integers integers)))
 {% endhighlight %}
+
+### Exercise 3.70<a id="Exercise3_70">&nbsp;</a>
+
+In this exercise, we are tasked with writing `weighted-pairs` which is similar to `pairs` except it also takes a weighing function and produces pairs ordered according to the weights. The code is as follows:-
+
+{% highlight scheme %}
+(define (merge s1 s2)
+  (cond ((stream-null? s1) s2)
+        ((stream-null? s2) s1)
+        (else
+         (let ((s1car (stream-car s1))
+               (s2car (stream-car s2)))
+           (cond ((< s1car s2car)
+                  (cons-stream 
+                   s1car 
+                   (merge (stream-cdr s1) 
+                          s2)))
+                 ((> s1car s2car)
+                  (cons-stream 
+                   s2car 
+                   (merge s1 
+                          (stream-cdr s2))))
+                 (else
+                  (cons-stream 
+                   s1car
+                   (merge 
+                    (stream-cdr s1)
+                    (stream-cdr s2)))))))))
+
+(define (weighted-pairs s t weight)
+  (cons-stream
+   (list (stream-car s) (stream-car t))
+   (merge-weighted
+    (stream-map (lambda (x)
+                  (list (stream-car s) x))
+                (stream-cdr t))
+    (weighted-pairs (stream-cdr s)
+                    (stream-cdr t)
+                    weight))))
+{% endhighlight %}
+
+Note that we assume weights are monotonously increasing for pairs `(x y) (x (+ y 1)) (x (+ y 2))...`.
+
+Let us see the code for the required orders.
+
+##### Ordered according to sum $$i+j$$
+
+{% highlight scheme %}
+(define pairs1
+  (weighted-pairs integers
+                  integers
+                  (lambda (x)
+                    (+ (car x)
+                       (cadr x)))))
+{% endhighlight %}
+
+##### Ordered according to sum $$2i+3j+5ij$$
+
+{% highlight scheme %}
+(define pairs2
+  (weighted-pairs integers
+                  integers
+                  (lambda (x)
+                    (+ (* 2 (car x))
+                       (* 3 (cadr x))
+                       (* 5 (car x) (cadr x))))))
+{% endhighlight %}
