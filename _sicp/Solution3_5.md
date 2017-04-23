@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 26
 title: Section 3.5 solutions
-exercises: '3.50 - 3.62'
+exercises: '3.50 - 3.66'
 submenu:
   - { hook: "Exercise3_50", title: "Exercise 3.50" }
   - { hook: "Exercise3_51", title: "Exercise 3.51" }
@@ -21,6 +21,7 @@ submenu:
   - { hook: "Exercise3_64", title: "Exercise 3.64" }
   - { hook: "Exercise3_65", title: "Exercise 3.65" }
   - { hook: "Exercise3_66", title: "Exercise 3.66" }
+  - { hook: "Exercise3_67", title: "Exercise 3.67" }
 ---
 
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
@@ -489,3 +490,22 @@ For finding the number of preceding elements for `(99 100)`, lets us peel out th
 ##### `(100 100)`
 
 As determined in the previous segment, `(100 100)` has $$2^100-1$$ preceding elements.
+
+### Exercise 3.67<a id="Exercise3_67">&nbsp;</a>
+
+In the above exercise, the `pairs` stream generates pair of form `(i j)` where $$i<=j$$. In this exercise, we are tasked with generating a stream with all pairs without this condition. This can be done by modifying the `pairs` function as follows:-
+
+{% highlight scheme %}
+(define (all-pairs s t)
+  (cons-stream
+   (list (stream-car s) (stream-car t))
+   (interleave
+    (stream-map (lambda (x) 
+                  (list (stream-car s) x))
+                (stream-cdr t))
+    (interleave
+     (stream-map (lambda (x) 
+                   (list x (stream-car s)))
+                 (stream-cdr t))
+     (all-pairs (stream-cdr s) (stream-cdr t))))))
+{% endhighlight %}
