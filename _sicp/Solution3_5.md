@@ -509,3 +509,20 @@ In the above exercise, the `pairs` stream generates pair of form `(i j)` where $
                  (stream-cdr t))
      (all-pairs (stream-cdr s) (stream-cdr t))))))
 {% endhighlight %}
+
+### Exercise 3.68<a id="Exercise3_68">&nbsp;</a>
+
+In this exercise, we are given an alternative definition for `pairs` by Louis Reasoner as follows:-
+
+{% highlight scheme %}
+(define (pairs s t)
+  (interleave
+   (stream-map
+    (lambda (x) 
+      (list (stream-car s) x))
+    t)
+   (pairs (stream-cdr s)
+          (stream-cdr t))))
+{% endhighlight %}
+
+This would not work. When we evaluate `(pairs integers integers)`, we would also recursively evaluate `(pairs (stream-cdr integers) (stream-cdr integers))` immediately to feed as an argument to `interleave`. This would lead to an infinite recursion and stack to blow up.
