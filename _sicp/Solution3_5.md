@@ -526,3 +526,25 @@ In this exercise, we are given an alternative definition for `pairs` by Louis Re
 {% endhighlight %}
 
 This would not work. When we evaluate `(pairs integers integers)`, we would also recursively evaluate `(pairs (stream-cdr integers) (stream-cdr integers))` immediately to feed as an argument to `interleave`. This would lead to an infinite recursion and stack to blow up.
+
+### Exercise 3.69<a id="Exercise3_69">&nbsp;</a>
+
+In this exercise, we are tasked with defining a stream `triples` that produces a stream of triples `(i j k)` where $$i<=j<=k$$. Then, we are tasked with using `triples` to generate the stream of all [Pythagorean triples](https://www.wikiwand.com/en/Pythagorean_triple). The code is as follows:-
+
+{% highlight scheme %}
+(define (triples s t u)
+  (cons-stream
+   (list (stream-car s) (stream-car t) (stream-car u))
+   (interleave
+    (stream-map (lambda (x)
+                  (cons (stream-car s) x))
+                (stream-cdr (pairs t u)))
+    (triples (stream-cdr s) (stream-cdr t) (stream-cdr u)))))
+
+(define pythagorean-triples
+  (stream-filter (lambda (x)
+                   (= (+ (square (car x))
+                         (square (cadr x)))
+                      (square (caddr x))))
+                 (triples integers integers integers)))
+{% endhighlight %}
