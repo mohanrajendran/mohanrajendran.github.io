@@ -247,7 +247,7 @@ In this exercise, we are aked to define `S` which is a stream of numbers beginni
                    s1car
                    (merge 
                     (stream-cdr s1)
-                    (stream-cdr s2)))))))))
+                    s2))))))))
 
 (define S
   (cons-stream 1
@@ -554,39 +554,36 @@ In this exercise, we are tasked with defining a stream `triples` that produces a
 In this exercise, we are tasked with writing `weighted-pairs` which is similar to `pairs` except it also takes a weighing function and produces pairs ordered according to the weights. The code is as follows:-
 
 {% highlight scheme %}
-(define (merge s1 s2)
+(define (merge-weighted s1 s2 weight)
   (cond ((stream-null? s1) s2)
         ((stream-null? s2) s1)
         (else
          (let ((s1car (stream-car s1))
                (s2car (stream-car s2)))
-           (cond ((< s1car s2car)
-                  (cons-stream 
-                   s1car 
-                   (merge (stream-cdr s1) 
-                          s2)))
-                 ((> s1car s2car)
+           (cond ((> (weight s1car) (weight s2car))
                   (cons-stream 
                    s2car 
-                   (merge s1 
-                          (stream-cdr s2))))
+                   (merge-weighted
+                    s1 
+                    (stream-cdr s2)
+                    weight)))
                  (else
                   (cons-stream 
                    s1car
-                   (merge 
+                   (merge-weighted 
                     (stream-cdr s1)
-                    (stream-cdr s2)))))))))
+                    s2
+                    weight))))))))
 
 (define (weighted-pairs s t weight)
   (cons-stream
    (list (stream-car s) (stream-car t))
    (merge-weighted
-    (stream-map (lambda (x)
+    (stream-map (lambda (x) 
                   (list (stream-car s) x))
                 (stream-cdr t))
-    (weighted-pairs (stream-cdr s)
-                    (stream-cdr t)
-                    weight))))
+    (weighted-pairs (stream-cdr s) (stream-cdr t) weight)
+    weight)))
 {% endhighlight %}
 
 Note that we assume weights are monotonously increasing for pairs `(x y) (x (+ y 1)) (x (+ y 2))...`.
@@ -615,3 +612,36 @@ Let us see the code for the required orders.
                        (* 3 (cadr x))
                        (* 5 (car x) (cadr x))))))
 {% endhighlight %}
+
+### Exercise 3.71<a id="Exercise3_71">&nbsp;</a>
+
+In this exercise, we are tasked with generating a stream of [Ramanujam numbers](http://mathworld.wolfram.com/Hardy-RamanujanNumber.html). The code for that is as follows:-
+
+{% highlight scheme %}
+(define (ramanujam-numbers)
+  (define (cube-sum x)
+    (+ (* (car x) (car x) (car x))
+       (* (cadr x) (cadr x) (cadr x))))
+  (define (cube-stream)
+    (weighted-pairs integers integers cube-sum))
+  (define (stream-cadr s) (stream-car (stream-cdr s)))
+  (define (same-successive s)
+    (let ((first (stream-car s))
+          (second (stream-cadr s)))
+      (if (= (cube-sum first)
+             (cube-sum second))
+          (cons-stream (list (cube-sum first) first second)
+                       (same-successive (stream-cdr s)))
+          (same-successive (stream-cdr s)))))
+  (same-successive (cube-stream)))
+{% endhighlight %}
+
+Running this code, we get the following numbers:-
+
+$$\begin{align}
+1^3 + 12^3 &= 9^3 + 10^3 &&= 1729 \\
+2^3 + 16^3 &= 9^3 + 15^3 &&= 4104 \\
+2^3 + 24^3 &= 18^3 + 20^3 &&= 13832 \\
+10^3 + 27^3 &= 19^3 + 24^3 &&= 20683 \\
+4^3 + 32^3 &= 18^3 + 30^3 &&= 32832
+\end{align}$$
