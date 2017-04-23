@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 26
 title: Section 3.5 solutions
-exercises: '3.50 - 3.66'
+exercises: '3.50 - 3.72'
 submenu:
   - { hook: "Exercise3_50", title: "Exercise 3.50" }
   - { hook: "Exercise3_51", title: "Exercise 3.51" }
@@ -22,6 +22,11 @@ submenu:
   - { hook: "Exercise3_65", title: "Exercise 3.65" }
   - { hook: "Exercise3_66", title: "Exercise 3.66" }
   - { hook: "Exercise3_67", title: "Exercise 3.67" }
+  - { hook: "Exercise3_68", title: "Exercise 3.68" }
+  - { hook: "Exercise3_69", title: "Exercise 3.69" }
+  - { hook: "Exercise3_70", title: "Exercise 3.70" }
+  - { hook: "Exercise3_71", title: "Exercise 3.71" }
+  - { hook: "Exercise3_72", title: "Exercise 3.72" }
 ---
 
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
@@ -644,4 +649,41 @@ $$\begin{align}
 2^3 + 24^3 &= 18^3 + 20^3 &&= 13832 \\
 10^3 + 27^3 &= 19^3 + 24^3 &&= 20683 \\
 4^3 + 32^3 &= 18^3 + 30^3 &&= 32832
+\end{align}$$
+
+### Exercise 3.72<a id="Exercise3_72">&nbsp;</a>
+
+In this exercise, we are tasked with generating a stream of all numbers that can be written as the sum of two squares in three different ways. We can do that similar to `ramanujam-numbers` stream above:-
+
+{% highlight scheme %}
+(define (sum-square-three-ways)
+  (define (square-sum x)
+    (+ (* (car x) (car x))
+       (* (cadr x) (cadr x))))
+  (define (square-stream)
+    (weighted-pairs integers integers square-sum))
+  (define (stream-cadr s) (stream-car (stream-cdr s)))
+  (define (stream-cddr s) (stream-cdr (stream-cdr s)))
+  (define (stream-caddr s) (stream-car (stream-cddr s)))
+  (define (same-successive s)
+    (let ((first (stream-car s))
+          (second (stream-cadr s))
+          (third (stream-caddr s)))
+      (if (= (square-sum first)
+             (square-sum second)
+             (square-sum third))
+          (cons-stream (list (square-sum first) first second third)
+                       (same-successive (stream-cddr s)))
+          (same-successive (stream-cdr s)))))
+  (same-successive (square-stream)))
+{% endhighlight %}
+
+The first five such numbers are as follows:-
+
+$$\begin{align}
+1^2 + 18^2 &= 6^2 + 17^2 &&= 10^2 + 15^2 &&&= 325 \\
+5^2 + 20^2 &= 8^2 + 19^2 &&= 13^2 + 16^2 &&&= 425 \\
+5^2 + 25^2 &= 11^2 + 23^2 &&= 17^2 + 19^2 &&&= 650 \\
+7^2 + 26^2 &= 10^2 + 25^2 &&= 14^2 + 23^2 &&&= 725 \\
+2^2 + 29^2 &= 13^2 + 26^2 &&= 19^2 + 22^2 &&&= 845
 \end{align}$$
