@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 26
 title: Section 3.5 solutions
-exercises: '3.50 - 3.72'
+exercises: '3.50 - 3.76'
 submenu:
   - { hook: "Exercise3_50", title: "Exercise 3.50" }
   - { hook: "Exercise3_51", title: "Exercise 3.51" }
@@ -27,6 +27,10 @@ submenu:
   - { hook: "Exercise3_70", title: "Exercise 3.70" }
   - { hook: "Exercise3_71", title: "Exercise 3.71" }
   - { hook: "Exercise3_72", title: "Exercise 3.72" }
+  - { hook: "Exercise3_73", title: "Exercise 3.73" }
+  - { hook: "Exercise3_74", title: "Exercise 3.74" }
+  - { hook: "Exercise3_75", title: "Exercise 3.75" }
+  - { hook: "Exercise3_76", title: "Exercise 3.76" }
 ---
 
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
@@ -609,9 +613,15 @@ Let us see the code for the required orders.
 ##### Ordered according to sum $$2i+3j+5ij$$
 
 {% highlight scheme %}
+(define int235
+  (stream-filter (lambda (x) (not (or (= (remainder x 2) 0)
+                                      (= (remainder x 3) 0)
+                                      (= (remainder x 5) 0))))
+                 integers))
+
 (define pairs2
-  (weighted-pairs integers
-                  integers
+  (weighted-pairs int235
+                  int235
                   (lambda (x)
                     (+ (* 2 (car x))
                        (* 3 (cadr x))
@@ -687,3 +697,146 @@ $$\begin{align}
 7^2 + 26^2 &= 10^2 + 25^2 &&= 14^2 + 23^2 &&&= 725 \\
 2^2 + 29^2 &= 13^2 + 26^2 &&= 19^2 + 22^2 &&&= 845
 \end{align}$$
+
+### Exercise 3.73<a id="Exercise3_73">&nbsp;</a>
+
+In this exercise, we are tasked with creating a stream simulating a circuit $$v=v_0+\frac{1}{C}\int_{0}^{t} i dt + Ri$$. We need to create a function `RC` that takes resistance *R* and capacitance *C* along with time step *dt* and returns a function. This function should take the stream representing the time sequence of currents *i* and initial voltage $$v_0$$ and return a stream of output voltage *v*. The code for that is as follows:-
+
+{% highlight scheme %}
+(define (RC R C dt)
+  (define (circuit i v0)
+    (add-streams (integral (scale-stream i (/ 1.0 C)) v0 dt)
+                 (scale-stream i R)))
+  circuit)
+{% endhighlight %}
+
+### Exercise 3.74<a id="Exercise3_74">&nbsp;</a>
+
+In this exercise, we are tasked with filling out the code given by Eva Lu Ator to simplify `zero-crossings` function. The code is as follows:-
+
+{% highlight scheme %}
+(define zero-crossings
+  (stream-map sign-change-detector 
+              sense-data 
+              (stream-cdr sense-data)))
+{% endhighlight %}
+
+### Exercise 3.75<a id="Exercise3_75">&nbsp;</a>
+
+We are given a function from Louis Reasoner to smooth out a stream of numbers by averaging successive numbers to produce a smoothed zero-crossings function. The given code is as follows:-
+
+{% highlight scheme %}
+(define (make-zero-crossings 
+         input-stream last-value)
+  (let ((avpt 
+         (/ (+ (stream-car input-stream) 
+               last-value) 
+            2)))
+    (cons-stream 
+     (sign-change-detector avpt last-value)
+     (make-zero-crossings 
+      (stream-cdr input-stream) avpt))))
+{% endhighlight %}
+
+The main mistake being done in the code is that we are feeding the current averge and last value to the `sign-change-detector`. The correct method is to feed the previous average and the current average. Thus the correct code is as follows:-
+
+{% highlight scheme %}
+(define (make-zero-crossings 
+         input-stream last-value last-average)
+  (let ((avpt 
+         (/ (+ (stream-car input-stream) 
+               last-value) 
+            2)))
+    (cons-stream 
+     (sign-change-detector avpt last-average)
+     (make-zero-crossings 
+      (stream-cdr input-stream) (stream-car input-stream) avpt))))
+{% endhighlight %}
+
+### Exercise 3.76<a id="Exercise3_76">&nbsp;</a>
+
+We are advised by Eva Lu Ator to modularize our code so as to separate out the smoothing algorithm and the crossings calculation. The code to do that is as follows:-
+
+{% highlight scheme %}
+(define (smooth input-stream)
+  (stream-map (lambda (x y)
+                (/ (+ x y ) 2))
+              input-stream
+              (stream-cdr input-stream)))
+
+(define (make-zero-crossings input-stream)
+  (let ((smoothed-stream (smooth input-stream)))
+    (stream-map sign-change-detector
+                smoothed-stream
+                (stream-cdr smoothed-stream))))
+{% endhighlight %}
+
+### Exercise 3.77<a id="Exercise3_77">&nbsp;</a>
+
+We are required to modify the given `integral` procedure to use a delayed integrand function. The modified function is as follows:-
+
+{% highlight scheme %}
+(define (integral
+         delayed-integrand initial-value dt)
+  (cons-stream 
+   initial-value
+   (let ((integrand 
+          (force delayed-integrand)))
+     (if (stream-null? integrand)
+         the-empty-stream
+         (integral 
+          (stream-cdr integrand)
+          (+ (* dt (stream-car integrand))
+             initial-value)
+          dt)))))
+{% endhighlight %}
+
+### Exercise 3.78<a id="Exercise3_78">&nbsp;</a>
+
+In this exercise, we are asked to design a signal-processing system to solve $$\frac{d^2y}{dt^2}-a\frac{dy}{dt}-by=0$$. The code is as follows:-
+
+{% highlight scheme %}
+(define (solve-2nd a b y0 dy0 dt)
+  (define y (integral (delay dy) y0 dt))
+  (define dy (integral (delay ddy) dy0 dt))
+  (define ddy (add-streams (scale-stream dy a)
+                           (scale-stream ddy b)))
+  y)
+{% endhighlight %}
+
+### Exercise 3.79<a id="Exercise3_79">&nbsp;</a>
+
+We are now asked to modify `solve-2nd` to solve equations of form $$\frac{d^2y}{dt^2}=f(\frac{dy}{dt}, y)$$. The code to do that is as follows:-
+
+{% highlight scheme %}
+(define (solve-2nd f y0 dy0 dt)
+  (define y (integral (delay dy) y0 dt))
+  (define dy (integral (delay ddy) dy0 dt))
+  (define ddy (stream-map dy y))
+  y)
+{% endhighlight %}
+
+### Exercise 3.80<a id="Exercise3_80">&nbsp;</a>
+
+In this exercise, we are asked to simulate an series RLC circuit with *R*, *L* and *C* as the resistance, inductance and capacitance. The circuit can be simulated as follows:-
+
+{% highlight scheme %}
+(define (RLC R L C dt)
+  (define (circuit vC0 iL0)
+    (define vC (integral (delay dvC) vC0 dt))
+    (define iL (integral (delay diL) iL0 dt))
+    (define dvC (scale-stream iL (/ (- 1) C)))
+    (define diL (add-streams (scale-stream vC (/ 1 L))
+                             (scale-stream iL (/ (- R) L))))
+    (cons vC iL))
+  circuit)
+{% endhighlight %}
+
+The stream for R = 1 ohm, CC = 0.2 farad, LL = 1 henry, dt = 0.1 second, and initial values iL0 = 0 amps and vC0 = 10 volts can be generated as follows:-
+
+{% highlight scheme %}
+(define RLC1 (RLC 1 0.2 1 0.1))
+(define streams (RLC1 0 10))
+(define vC (car streams))
+(define iL (cdr streams))
+{% endhighlight %}
