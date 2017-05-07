@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 26
 title: Section 3.5 solutions
-exercises: '3.50 - 3.76'
+exercises: '3.50 - 3.82'
 submenu:
   - { hook: "Exercise3_50", title: "Exercise 3.50" }
   - { hook: "Exercise3_51", title: "Exercise 3.51" }
@@ -31,6 +31,12 @@ submenu:
   - { hook: "Exercise3_74", title: "Exercise 3.74" }
   - { hook: "Exercise3_75", title: "Exercise 3.75" }
   - { hook: "Exercise3_76", title: "Exercise 3.76" }
+  - { hook: "Exercise3_77", title: "Exercise 3.77" }
+  - { hook: "Exercise3_78", title: "Exercise 3.78" }
+  - { hook: "Exercise3_79", title: "Exercise 3.79" }
+  - { hook: "Exercise3_80", title: "Exercise 3.80" }
+  - { hook: "Exercise3_81", title: "Exercise 3.81" }
+  - { hook: "Exercise3_82", title: "Exercise 3.82" }
 ---
 
 In this section, we are introduced to streams. Implementation of streams require lazy evaluation. Since all of user-created functions in Scheme is eagerly evaluated, we need to use [macros](https://en.wikipedia.org/wiki/Macro_(computer_science)). They can be declared using the `define-syntax` command as follows:-
@@ -839,4 +845,50 @@ The stream for R = 1 ohm, CC = 0.2 farad, LL = 1 henry, dt = 0.1 second, and ini
 (define streams (RLC1 0 10))
 (define vC (car streams))
 (define iL (cdr streams))
+{% endhighlight %}
+
+### Exercise 3.81<a id="Exercise3_81">&nbsp;</a>
+
+In this exercise, we are tasked with creating a random stream function that takes a command streams containing either `'generate` or `('reset n)`. The code for that is as follows:-
+
+{% highlight scheme %}
+(define (rand-update x)
+  (let ((m (expt 2 31))
+        (a 1103515245)
+        (c 12345))
+    (modulo (+ (* a x) c) m)))
+
+(define (random-numbers command-stream)
+  (define (rand-helper num command-stream)
+    (let ((command (stream-car command-stream)))
+      (cond ((eq? command 'generate)
+             (cons-stream num
+                          (rand-helper (rand-update num)
+                                       (stream-cdr command-stream))))
+            ((and (pair? command)
+                  (eq? (car command) 'reset))
+             (cons-stream (cdr command)
+                          (rand-helper (rand-update (cdr command))
+                                       (stream-cdr command-stream)))))))
+  (rand-helper 0 command-stream))
+{% endhighlight %}
+
+### Exercise 3.82<a id="Exercise3_82">&nbsp;</a>
+
+In this exercise, we are tasked with implementing `estimate-integral` which can perform Monte Carlo integration. The code for that is as follows:-
+
+{% highlight scheme %}
+(define (rand-stream)
+  (define command-stream (cons-stream 'generate command-stream))
+  (random-numbers command-stream))
+
+(define (estimate-integral p x1 x2 y1 y2)
+  (define (trial-stream rand-stream)
+    (let ((xraw (stream-car rand-stream))
+          (yraw (stream-car (stream-cdr rand-stream))))
+      (let ((x (+ x1 (modulo xraw (- x2 x1))))
+            (y (+ y1 (modulo yraw (- y2 y1)))))
+        (cons-stream (p x y)
+                     (trial-stream (stream-cdr (stream-cdr rand-stream)))))))
+  (trial-stream (rand-stream)))
 {% endhighlight %}
