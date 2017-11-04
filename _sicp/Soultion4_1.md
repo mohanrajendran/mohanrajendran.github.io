@@ -2,11 +2,12 @@
 layout: spiedpage
 order: 28
 title: Section 4.1 solutions
-exercises: '4.1 - 4.3'
+exercises: '4.1 - 4.4'
 submenu:
   - { hook: "Exercise4_1", title: "Exercise 4.1" }
   - { hook: "Exercise4_2", title: "Exercise 4.2" }
   - { hook: "Exercise4_3", title: "Exercise 4.3" }
+  - { hook: "Exercise4_4", title: "Exercise 4.4" }
 ---
 
 ### Exercise 4.1<a id="Exercise4_1">&nbsp;</a>
@@ -87,7 +88,7 @@ In this exercise, we are tasked with rewriting `eval` so that the dispatch is do
                   (begin-actions exp)
                   env)))
 (put-op 'cond (lambda (exp env)
-                (analyze (cond->if exp))))
+                (eval (cond->if exp))))
 {% endhighlight %}
 
 Based on the above set-up, let us rewrite the `eval` function by replacing the tagged expressions with the data-direction:-
@@ -109,3 +110,40 @@ Based on the above set-up, let us rewrite the `eval` function by replacing the t
           (error "Unknown expression
                  type: EVAL" exp)))))
 {% endhighlight %}
+
+### Exercise 4.4<a id="Exercise4_4">&nbsp;</a>
+
+In this exercise, we are tasked with implementing the functionality to evaluate `and` and `or` functions and install them to the `eval` function. The code can be written using `make-if` and following the same pattern as `cond`:-
+
+{% highlight scheme %}
+(define (and? exp)
+  (tagged-list? exp 'and))
+(define (and-clauses exp) (cdr exp))
+(define (and->if exp)
+  (expand-and-clauses (and-clauses exp)))
+(define (expand-and-clauses clauses)
+  (if (null? clauses)
+      'true
+      (make-if (car clauses)
+               (expand-and-clauses clauses)
+               'false)))
+
+(define (or? exp)
+  (tagged-list? exp 'or))
+(define (or-clauses exp) (cdr exp))
+(define (or->if exp)
+  (expand-or-clauses (or-clauses exp)))
+(define (expand-or-clauses clauses)
+  (if (null? clauses)
+      'false
+      (make-if (car clauses)
+               'true
+               (expand-and-clauses clauses))))
+
+(define (eval exp env)
+  (cond (...)
+        ((and? exp) (eval (and->if exp)))
+        ((or? exp) (eval (or->if exp)))
+        (...)))
+{% endhighlight %}
+
