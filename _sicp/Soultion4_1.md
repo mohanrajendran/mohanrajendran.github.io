@@ -2,10 +2,11 @@
 layout: spiedpage
 order: 28
 title: Section 4.1 solutions
-exercises: '4.1 - 4.2'
+exercises: '4.1 - 4.3'
 submenu:
   - { hook: "Exercise4_1", title: "Exercise 4.1" }
   - { hook: "Exercise4_2", title: "Exercise 4.2" }
+  - { hook: "Exercise4_3", title: "Exercise 4.3" }
 ---
 
 ### Exercise 4.1<a id="Exercise4_1">&nbsp;</a>
@@ -59,4 +60,52 @@ Now, Louis proposes another syntax for evaluation known as `call`. For example, 
   (tagged-list? exp 'call))
 (define (operator exp) (cadr exp))
 (define (operands exp) (cddr exp))
+{% endhighlight %}
+
+### Exercise 4.3<a id="Exercise4_3">&nbsp;</a>
+
+In this exercise, we are tasked with rewriting `eval` so that the dispatch is done in a data-directed style. Based on the code from section 2, we set up an initial dispatch table as follows along with functions for tagged expressions.
+
+{% highlight scheme %}
+(define dispatch-table (make-hash-table equal?))
+(define (put-op type proc)
+  (hash-table/put! dispatch-table type proc))
+(define (get-op type)
+  (hash-table/get dispatch-table type #f))
+
+(put-op 'quote (lambda (exp env) (text-of-quotation exp)))
+(put-op 'set! eval-assignment)
+(put-op 'define eval-definition)
+(put-op 'if eval-if)
+(put-op 'lambda (lambda (exp env)
+                  (make-procedure
+                   (lambda-parameters exp)
+                   (lambda-body exp)
+                   env)))
+(put-op 'begin (lambda (exp env)
+                 (eval-sequence
+                  (begin-actions exp)
+                  env)))
+(put-op 'cond (lambda (exp env)
+                (analyze (cond->if exp))))
+{% endhighlight %}
+
+Based on the above set-up, let us rewrite the `eval` function by replacing the tagged expressions with the data-direction:-
+
+{% highlight scheme %}
+((define (eval exp env)
+   (cond ((self-evaluating? exp)
+          exp)
+         ((variable? exp)
+          (lookup-variable-value exp env))
+         ((get-op (car exp))
+          ((get-op (car exp)) exp env))
+         ((application? exp)
+          (apply (eval (operator exp) env)
+                 (list-of-values
+                  (operands exp)
+                  env)))
+         (else
+          (error "Unknown expression
+                 type: EVAL" exp)))))
 {% endhighlight %}
