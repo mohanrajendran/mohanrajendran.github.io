@@ -2,12 +2,13 @@
 layout: spiedpage
 order: 28
 title: Section 4.1 solutions
-exercises: '4.1 - 4.4'
+exercises: '4.1 - 4.5'
 submenu:
   - { hook: "Exercise4_1", title: "Exercise 4.1" }
   - { hook: "Exercise4_2", title: "Exercise 4.2" }
   - { hook: "Exercise4_3", title: "Exercise 4.3" }
   - { hook: "Exercise4_4", title: "Exercise 4.4" }
+  - { hook: "Exercise4_5", title: "Exercise 4.5" }
 ---
 
 ### Exercise 4.1<a id="Exercise4_1">&nbsp;</a>
@@ -90,7 +91,6 @@ In this exercise, we are tasked with rewriting `eval` so that the dispatch is do
 (put-op 'cond (lambda (exp env)
                 (eval (cond->if exp))))
 {% endhighlight %}
-
 Based on the above set-up, let us rewrite the `eval` function by replacing the tagged expressions with the data-direction:-
 
 {% highlight scheme %}
@@ -147,3 +147,45 @@ In this exercise, we are tasked with implementing the functionality to evaluate 
         (...)))
 {% endhighlight %}
 
+### Exercise 4.5<a id="Exercise4_5">&nbsp;</a>
+
+In this exercise, we need to add a way to evaulate an additional syntax for `cond` of type `(test => recipient)`. To do that, we define the following tester functions:-
+
+{% highlight scheme %}
+(define (cond-apply-clause? clause)
+  (eq? (cadr clause) '=>))
+(define (cond-apply-test clause)
+  (car clause))
+(define (cond-apply-recipient clause)
+  (caddr clause))
+{% endhighlight %}
+
+Next, we modify the `cond` clause generator to include the syntax:-
+
+{% highlight scheme %}
+(define (expand-clauses clauses)
+  (if (null? clauses)
+      'false     ; no else clause
+      (let ((first (car clauses))
+            (rest (cdr clauses)))
+        (if (cond-else-clause? first)
+            (if (null? rest)
+                (sequence->exp
+                 (cond-actions first))
+                (error "ELSE clause isn't
+                        last: COND->IF"
+                       clauses))
+            (if (cond-apply-clause? first)
+                (list (make-lambda '(_cond-test)
+                                   (make-if (cond-apply-test first)
+                                            (list _cond-test (cond-apply-test first))
+                                            (expand-clauses rest)))
+                      (cond-apply-test first))
+                (make-if (cond-predicate first)
+                         (sequence->exp
+                          (cond-actions first))
+                         (expand-clauses
+                          rest)))))))
+{% endhighlight %}
+
+We use the lambda expression to make sure that the `test` is only run once in case it has side-effects.
