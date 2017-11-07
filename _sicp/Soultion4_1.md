@@ -2,7 +2,7 @@
 layout: spiedpage
 order: 28
 title: Section 4.1 solutions
-exercises: '4.1 - 4.6'
+exercises: '4.1 - 4.7'
 submenu:
   - { hook: "Exercise4_1", title: "Exercise 4.1" }
   - { hook: "Exercise4_2", title: "Exercise 4.2" }
@@ -10,6 +10,7 @@ submenu:
   - { hook: "Exercise4_4", title: "Exercise 4.4" }
   - { hook: "Exercise4_5", title: "Exercise 4.5" }
   - { hook: "Exercise4_6", title: "Exercise 4.6" }
+  - { hook: "Exercise4_7", title: "Exercise 4.7" }
 ---
 
 ### Exercise 4.1<a id="Exercise4_1">&nbsp;</a>
@@ -227,3 +228,23 @@ Now we can handle `let` by modifying `eval` as follows:-
         ((let? exp) (eval (let->combination exp)))
         (...)))
 {% endhighlight %}
+
+### Exercise 4.7<a id="Exercise4_7">&nbsp;</a>
+
+In this exercise, we need to write a converter for `let*` expression which is like `let` but allows for binding the variables one by one such that later bindings have access to the earlier bindings. Thus, `let*` can be expressed in terms of recursive `let`. The code to do that is as follows:-
+
+{% highlight scheme %}
+(define (let*? exp)
+  (tagged-list? exp 'let?))
+(define (let*->nested-lets exp)
+  (expand-let* (let-bindings exp) (let-body exp)))
+(define (expand-let* bindings body)
+  (if (null? bindings)
+      body
+      (list
+       'let
+       (list car-bindings)
+       (expand-let (cdr bindings) body))))
+{% endhighlight %}
+
+It is sufficient to add a clause `(eval (let*->nested-lets exp) env)` to `eval`. The `eval` function can recursively transform the expression until the primitive value.
