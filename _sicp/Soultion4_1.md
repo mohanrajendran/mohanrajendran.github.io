@@ -2,13 +2,14 @@
 layout: spiedpage
 order: 28
 title: Section 4.1 solutions
-exercises: '4.1 - 4.5'
+exercises: '4.1 - 4.6'
 submenu:
   - { hook: "Exercise4_1", title: "Exercise 4.1" }
   - { hook: "Exercise4_2", title: "Exercise 4.2" }
   - { hook: "Exercise4_3", title: "Exercise 4.3" }
   - { hook: "Exercise4_4", title: "Exercise 4.4" }
   - { hook: "Exercise4_5", title: "Exercise 4.5" }
+  - { hook: "Exercise4_6", title: "Exercise 4.6" }
 ---
 
 ### Exercise 4.1<a id="Exercise4_1">&nbsp;</a>
@@ -189,3 +190,40 @@ Next, we modify the `cond` clause generator to include the syntax:-
 {% endhighlight %}
 
 We use the lambda expression to make sure that the `test` is only run once in case it has side-effects.
+
+### Exercise 4.6<a id="Exercise4_6">&nbsp;</a>
+
+In this exercise, we need to rewrite `let` expressions as derived expressions composed of `lambda` expressions. This can be done using the following code:-
+
+{% highlight scheme %}
+(define (let? exp)
+  (tagged-list? exp 'let))
+(define (let-bindings exp)
+  (cadr exp))
+(define (let-body exp)
+  (cddr exp))
+(define (binding-names bindings)
+  (if (null? bindings)
+      '()
+      (cons (caar bindings)
+            (binding-names bindings))))
+(define (binding-values bindings)
+  (if (null? bindings)
+      '()
+      (cons (cadr bindings)
+            (binding-names bindings))))
+(define (let->combination exp)
+  (let ((bindings (let-bindings exp)))
+    (list (make-lambda (binding-names bindings)
+                       (let-body exp))
+          (binding-values bindings))))
+{% endhighlight %}
+
+Now we can handle `let` by modifying `eval` as follows:-
+
+{% highlight scheme %}
+(define (eval exp env)
+  (cond (...)
+        ((let? exp) (eval (let->combination exp)))
+        (...)))
+{% endhighlight %}
