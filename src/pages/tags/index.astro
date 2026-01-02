@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/BlogPost.astro';
+
+const allPosts = await getCollection('blog');
+const tags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
+const tagCounts = tags.map((tag) => ({
+  tag,
+  count: allPosts.filter((post) => post.data.tags.includes(tag)).length,
+}));
+---
+
+<Layout title="All Tags" description="Browse posts by tags" pubDate={new Date()} tags={[]} draft={false}>
+  <h1>All Tags</h1>
+  <div class="tag-cloud">
+    {
+      tagCounts.map(({ tag, count }) => (
+        <a href={`/tags/${tag}/`} class="tag">
+          {tag} ({count})
+        </a>
+      ))
+    }
+  </div>
+</Layout>
+
+<style>
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .tag {
+    padding: 0.5rem 1rem;
+    background: #f0f0f0;
+    border-radius: 1rem;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.2s;
+  }
+  .tag:hover {
+    background: #e0e0e0;
+  }
+</style>

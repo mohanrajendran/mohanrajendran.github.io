@@ -1,0 +1,42 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Building Systems, Sharing Knowledge</h1>
+			<p>
+				I'm Mohan Rajendran, a Senior Software Development Engineer at Amazon. I build large-scale distributed systems, work with GenAI applications, and solve complex problems in cloud infrastructure.
+			</p>
+			<p>
+				This is where I share what I learn. You'll find technical deep-dives, solutions to challenging problems, and my journey through computer science fundamentals. I believe in learning in public—documenting both successes and lessons learned along the way.
+			</p>
+
+			<h2>Current Focus</h2>
+			<p>
+				At Amazon Photos, I'm working on data pipelines, GenAI applications, and cloud migration initiatives. Previously, I was part of the founding team building infrastructure and data systems for Sponsored Products' Product Attribute Targeting—systems that handle high-volume traffic and serve millions of customers.
+			</p>
+
+			<h2>What You'll Find Here</h2>
+			<ul>
+				<li><strong><a href="/blog/">Technical Blog</a></strong> - System design, distributed systems, AI/ML, and software engineering insights</li>
+				<li><strong><a href="/blog/sicp-overview/">SICP Solutions</a></strong> - My journey through Structure and Interpretation of Computer Programs with detailed solutions and notes</li>
+				<li><strong><a href="/tags/">Browse by Topic</a></strong> - Filter content by technology, concept, or area of interest</li>
+			</ul>
+
+			<p>
+				Whether you're architecting distributed systems, exploring computer science fundamentals, or building production software, I hope you find something valuable here. <a href="/about/">Learn more about my background and experience</a>, or <a href="/blog/">dive into the blog</a>.
+			</p>
+		</main>
+		<Footer />
+	</body>
+</html>
