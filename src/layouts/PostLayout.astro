@@ -1,0 +1,448 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  readingTime?: number;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  tags = [],
+  readingTime,
+  ogImage,
+} = Astro.props;
+
+const formattedDate = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+
+const formattedUpdated = updatedDate?.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+---
+
+<BaseLayout {title} {description} {ogImage}>
+  <main>
+    <!-- ── Post header ──────────────────────────────────────────────────────── -->
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime={pubDate.toISOString()}>{formattedDate}</time>
+        {readingTime && (
+          <>
+            <span class="meta-dot">·</span>
+            <span>{readingTime} min read</span>
+          </>
+        )}
+        {tags.length > 0 && (
+          <>
+            <span class="meta-dot">·</span>
+            <div class="tag-list">
+              {tags.map(tag => (
+                <a class="tag" href={`/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {tag}
+                </a>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      <h1 class="post-title">{title}</h1>
+      <p class="post-subtitle">{description}</p>
+
+      {updatedDate && (
+        <p class="post-updated">
+          Updated <time datetime={updatedDate.toISOString()}>{formattedUpdated}</time>
+        </p>
+      )}
+    </header>
+
+    <!-- ── Post body ────────────────────────────────────────────────────────── -->
+    <article class="prose">
+      <slot />
+    </article>
+
+    <!-- ── Post footer ──────────────────────────────────────────────────────── -->
+    <footer class="post-footer">
+      {tags.length > 0 && (
+        <div class="post-footer-tags">
+          <span>Tagged:</span>
+          {tags.map(tag => (
+            <a class="tag" href={`/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`}>
+              {tag}
+            </a>
+          ))}
+        </div>
+      )}
+
+      <div class="share-block">
+        <h4>Found this useful?</h4>
+        <p>
+          Share it on{' '}
+          <a
+            href={`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(Astro.url.href)}&t=${encodeURIComponent(title)}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Hacker News
+          </a>{' '}
+          or follow on{' '}
+          <a href="https://x.com/mohanrajendran" rel="noopener noreferrer" target="_blank">
+            Twitter
+          </a>{' '}
+          for future posts.
+        </p>
+      </div>
+
+      <nav class="post-nav" aria-label="Post navigation">
+        <!-- Populated via JS from blog index — or wire up with Astro prev/next -->
+        <a href="/blog" class="back-link">← All posts</a>
+      </nav>
+    </footer>
+  </main>
+</BaseLayout>
+
+<style>
+  /* ── Page container ─────────────────────────────────────────────── */
+  main {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 64px 24px 120px;
+    animation: fadeUp 0.45s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Post header ──────────────────────────────────────────────── */
+  .post-header {
+    margin-bottom: 48px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-meta {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .meta-dot { color: var(--border); }
+
+  .tag-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tag:hover {
+    background: var(--accent);
+    color: white;
+  }
+
+  .post-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .post-subtitle {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.65;
+    font-style: italic;
+    margin: 0;
+  }
+
+  .post-updated {
+    margin-top: 12px;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* ── Prose styles ─────────────────────────────────────────────── */
+  /* These target MDX-rendered Markdown content */
+  .prose :global(p) {
+    font-size: 1rem;
+    line-height: var(--lh);
+    margin-bottom: 1.4em;
+    color: var(--text);
+  }
+
+  .prose :global(h2) {
+    font-family: var(--font-serif);
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--text);
+    margin-top: 2.8em;
+    margin-bottom: 0.65em;
+    line-height: 1.3;
+  }
+
+  .prose :global(h3) {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2em;
+    margin-bottom: 0.6em;
+  }
+
+  .prose :global(h4) {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 1.6em;
+    margin-bottom: 0.4em;
+  }
+
+  .prose :global(strong) {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .prose :global(em) {
+    font-style: italic;
+    color: inherit;
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+    text-underline-offset: 3px;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.5em;
+    margin-bottom: 1.4em;
+  }
+
+  .prose :global(li) {
+    margin-bottom: 0.45em;
+    line-height: 1.7;
+  }
+
+  .prose :global(li > p) { margin-bottom: 0.3em; }
+
+  /* Blockquote */
+  .prose :global(blockquote) {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-dim);
+    margin: 2em 0;
+    padding: 16px 20px;
+    border-radius: 0 6px 6px 0;
+  }
+  .prose :global(blockquote p) {
+    margin: 0;
+    color: #5a2020;
+    font-size: 0.95rem;
+  }
+
+  /* Horizontal rule → section divider */
+  .prose :global(hr) {
+    border: none;
+    text-align: center;
+    margin: 3em 0;
+    color: var(--border);
+    letter-spacing: 0.4em;
+    font-size: 0.8rem;
+  }
+  .prose :global(hr)::before {
+    content: '· · ·';
+  }
+
+  /* Tables */
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    margin: 2em 0;
+    display: block;
+    overflow-x: auto;
+  }
+  .prose :global(th) {
+    background: var(--text);
+    color: #fff;
+    font-weight: 500;
+    padding: 10px 14px;
+    text-align: left;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .prose :global(td) {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .prose :global(tr:nth-child(even) td) { background: #f6f4ef; }
+
+  /* Inline code */
+  .prose :global(:not(pre) > code) {
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    font-weight: 500;
+    background: var(--inline-bg);
+    color: var(--inline-fg);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* Fenced code blocks (Shiki) */
+  .prose :global(pre) {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    background: var(--code-bg) !important;
+    border: 1px solid #1e2533;
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin: 2em 0;
+    overflow-x: auto;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    scrollbar-width: thin;
+    scrollbar-color: #2a3040 transparent;
+  }
+  .prose :global(pre::-webkit-scrollbar) { height: 5px; }
+  .prose :global(pre::-webkit-scrollbar-thumb) {
+    background: #2a3040;
+    border-radius: 3px;
+  }
+  .prose :global(pre code) {
+    background: transparent !important;
+    color: var(--code-text);
+    padding: 0;
+    font-size: inherit;
+    border-radius: 0;
+    font-weight: 400;
+  }
+
+  /* Images */
+  .prose :global(img) {
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    margin: 2em auto;
+  }
+  .prose :global(figcaption) {
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: -1em;
+    margin-bottom: 2em;
+  }
+
+  /* ── Post footer ──────────────────────────────────────────────── */
+  .post-footer {
+    margin-top: 64px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .post-footer-tags {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .share-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+  }
+
+  .share-block h4 {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .share-block p {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .post-nav {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .back-link {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent); }
+
+  /* ── Responsive ───────────────────────────────────────────────── */
+  @media (max-width: 600px) {
+    main { padding: 36px 18px 80px; }
+    .prose :global(pre) { font-size: 0.75rem; padding: 14px 16px; }
+    .prose :global(table) { font-size: 0.8rem; }
+  }
+</style>

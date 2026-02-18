@@ -1,62 +1,111 @@
 ---
-import Layout from '../layouts/BlogPost.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<Layout
-	title="About Me"
-	description="Senior Software Development Engineer at Amazon, building scalable systems and exploring AI"
-	pubDate={new Date('January 01 2026')}
-	tags={[]}
-	draft={false}
+<BaseLayout
+  title="About"
+  description="About Mohan Rajendran — Senior SDE at Amazon, distributed systems and GenAI."
 >
-	<h2>Background</h2>
-	<p>
-		I'm Mohan Rajendran, a Senior Software Development Engineer at Amazon based in the Seattle area. I've spent several years building large-scale distributed systems—from serverless architectures to ML-powered platforms that serve millions of customers and handle high-volume traffic.
-	</p>
+  <main>
+    <header class="page-header">
+      <h1>About</h1>
+    </header>
 
-	<h2>What I'm Working On</h2>
-	<p>
-		Currently at Amazon Photos, I focus on:
-	</p>
-	<ul>
-		<li><strong>Data Pipelines</strong> - Building scalable data processing systems that handle massive volumes</li>
-		<li><strong>GenAI Applications</strong> - Integrating generative AI into production systems</li>
-		<li><strong>Cloud Migration</strong> - Leading initiatives to modernize infrastructure</li>
-	</ul>
-	<p>
-		Previously, I was part of the founding team for Sponsored Products' Product Attribute Targeting, where I built the infrastructure and data systems that power advertising features across Amazon's marketplace.
-	</p>
+    <article class="about-content">
+      <p>
+        I'm a Senior Software Development Engineer at Amazon, currently working at
+        <strong>Amazon Photos</strong> on data pipelines, GenAI applications, and cloud
+        migration initiatives.
+      </p>
+      <p>
+        Previously, I was part of the founding team building infrastructure and data
+        systems for Sponsored Products' Product Attribute Targeting — systems that handle
+        high-volume traffic and serve millions of customers.
+      </p>
 
-	<h2>Career Journey</h2>
-	<p>
-		Before Amazon, I worked in the energy sector at Bluware and Schlumberger, building geoscience platforms and real-time drilling automation systems. These experiences taught me how to build reliable systems in high-stakes environments.
-	</p>
-	<p>
-		<strong>Education:</strong> M.S. in Computational Science and Engineering (Georgia Tech), B.Tech in Aeronautical Engineering (MIT Chennai)
-	</p>
+      <h2>What I write about</h2>
+      <p>
+        This blog is where I think out loud. Most posts fall into one of these buckets:
+      </p>
+      <ul>
+        <li><strong>Distributed systems</strong> — consistency models, consensus protocols, failure modes</li>
+        <li><strong>AI/ML systems</strong> — inference, vector search, embedding pipelines, RAG</li>
+        <li><strong>Computer science fundamentals</strong> — algorithms, data structures, SICP</li>
+        <li><strong>Cloud infrastructure</strong> — AWS, data engineering, cost patterns</li>
+      </ul>
+      <p>
+        I believe in learning in public — documenting both the things that worked
+        and the things that didn't.
+      </p>
 
-	<h2>Technical Expertise</h2>
-	<p>
-		<strong>Languages & Frameworks:</strong> Java, Scala, Python, TypeScript<br>
-		<strong>Cloud & Infrastructure:</strong> AWS (Lambda, DynamoDB, S3, Kinesis, Step Functions), Apache Spark<br>
-		<strong>Specializations:</strong> Distributed systems, data pipelines, ML/AI integration, serverless architectures
-	</p>
+      <h2>Get in touch</h2>
+      <p>
+        The best ways to reach me are via
+        <a href="https://x.com/mohanrajendran" rel="noopener noreferrer" target="_blank">Twitter</a>
+        or
+        <a href="https://www.linkedin.com/in/mohan-rajendran-26421335/" rel="noopener noreferrer" target="_blank">LinkedIn</a>.
+        For code, find me on
+        <a href="https://github.com/mohanrajendran" rel="noopener noreferrer" target="_blank">GitHub</a>.
+      </p>
+    </article>
+  </main>
+</BaseLayout>
 
-	<h2>Why I Write</h2>
-	<p>
-		I believe in learning in public and sharing knowledge. This blog is where I document technical explorations, share lessons learned from building production systems, and work through computer science fundamentals. Whether I'm solving SICP exercises or architecting distributed systems, writing helps solidify my understanding and hopefully helps others along the way.
-	</p>
+<style>
+  main {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 64px 24px 120px;
+    animation: fadeUp 0.45s ease both;
+  }
 
-	<h2>Let's Connect</h2>
-	<p>
-		I'm always interested in connecting with fellow engineers, discussing system design challenges, or exploring new technologies. Find me on:
-	</p>
-	<ul>
-		<li><a href="https://github.com/mohanrajendran" target="_blank">GitHub</a> - Check out my code and projects</li>
-		<li><a href="https://www.linkedin.com/in/mohan-rajendran-26421335/" target="_blank">LinkedIn</a> - Professional background and network</li>
-		<li><a href="https://x.com/mohanrajendran" target="_blank">Twitter/X</a> - Technical thoughts and discussions</li>
-	</ul>
-	<p>
-		<a href="/blog/">Browse my technical writing</a> or <a href="/blog/sicp-overview/">see my SICP journey</a>.
-	</p>
-</Layout>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-header {
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .about-content p {
+    font-size: 1rem;
+    line-height: var(--lh);
+    margin-bottom: 1.4em;
+    color: var(--text);
+  }
+
+  .about-content h2 {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--text);
+    margin-top: 2.5em;
+    margin-bottom: 0.65em;
+  }
+
+  .about-content ul {
+    padding-left: 1.5em;
+    margin-bottom: 1.4em;
+  }
+
+  .about-content li {
+    margin-bottom: 0.5em;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 40px 18px 80px; }
+  }
+</style>

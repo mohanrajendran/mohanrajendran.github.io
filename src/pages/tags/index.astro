@@ -1,44 +1,121 @@
 ---
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import Layout from '../../layouts/BlogPost.astro';
 
-const allPosts = await getCollection('blog');
-const tags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
-const tagCounts = tags.map((tag) => ({
-  tag,
-  count: allPosts.filter((post) => post.data.tags.includes(tag)).length,
-}));
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// Build tag → count map
+const tagMap = new Map<string, number>();
+allPosts.forEach(post => {
+  post.data.tags.forEach(tag => {
+    tagMap.set(tag, (tagMap.get(tag) ?? 0) + 1);
+  });
+});
+
+const tags = [...tagMap.entries()]
+  .map(([name, count]) => ({
+    name,
+    count,
+    slug: name.toLowerCase().replace(/\s+/g, '-'),
+  }))
+  .sort((a, b) => b.count - a.count);
 ---
 
-<Layout title="All Tags" description="Browse posts by tags" pubDate={new Date()} tags={[]} draft={false}>
-  <h1>All Tags</h1>
-  <div class="tag-cloud">
-    {
-      tagCounts.map(({ tag, count }) => (
-        <a href={`/tags/${tag}/`} class="tag">
-          {tag} ({count})
+<BaseLayout title="Tags" description="Browse posts by topic.">
+  <main>
+    <header class="page-header">
+      <h1>Tags</h1>
+      <p>Browse {allPosts.length} posts by topic.</p>
+    </header>
+
+    <div class="tag-grid">
+      {tags.map(tag => (
+        <a href={`/tags/${tag.slug}`} class="tag-item">
+          <span class="tag-name">{tag.name}</span>
+          <span class="tag-count">{tag.count}</span>
         </a>
-      ))
-    }
-  </div>
-</Layout>
+      ))}
+    </div>
+  </main>
+</BaseLayout>
 
 <style>
-  .tag-cloud {
+  main {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 64px 24px 120px;
+    animation: fadeUp 0.45s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-header {
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .page-header p {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-weight: 300;
+    margin: 0;
+  }
+
+  .tag-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin: 2rem 0;
+    gap: 10px;
   }
-  .tag {
-    padding: 0.5rem 1rem;
-    background: #f0f0f0;
-    border-radius: 1rem;
+
+  .tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 5px;
     text-decoration: none;
-    color: #333;
-    transition: background-color 0.2s;
+    transition: border-color 0.15s, background 0.15s;
   }
-  .tag:hover {
-    background: #e0e0e0;
+
+  .tag-item:hover {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .tag-count {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 1px 7px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .tag-item:hover .tag-count {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: transparent;
   }
 </style>

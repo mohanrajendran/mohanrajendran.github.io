@@ -1,0 +1,93 @@
+---
+// Usage in MDX:
+//   import Callout from '@components/Callout.astro'
+//   <Callout type="note" title="Pro tip">Content here</Callout>
+
+type CalloutType = 'note' | 'warning' | 'tip' | 'danger';
+
+interface Props {
+  type?: CalloutType;
+  title?: string;
+  emoji?: string;
+}
+
+const {
+  type = 'note',
+  title,
+  emoji,
+} = Astro.props;
+
+const defaults: Record<CalloutType, { emoji: string; label: string }> = {
+  note:    { emoji: '💡', label: 'Note' },
+  tip:     { emoji: '⚡', label: 'Tip' },
+  warning: { emoji: '⚠️', label: 'Warning' },
+  danger:  { emoji: '🔴', label: 'Danger' },
+};
+
+const icon  = emoji ?? defaults[type].emoji;
+const label = title ?? defaults[type].label;
+---
+
+<aside class={`callout callout--${type}`} role="note">
+  <div class="callout-header">
+    <span class="callout-icon" aria-hidden="true">{icon}</span>
+    <span class="callout-title">{label}</span>
+  </div>
+  <div class="callout-body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    margin: 2em 0;
+    border-radius: 0 6px 6px 0;
+    overflow: hidden;
+  }
+
+  .callout--note    { border-left: 3px solid var(--accent); background: var(--accent-dim); }
+  .callout--tip     { border-left: 3px solid #2563eb;       background: #eff6ff; }
+  .callout--warning { border-left: 3px solid #d97706;       background: #fffbeb; }
+  .callout--danger  { border-left: 3px solid #dc2626;       background: #fef2f2; }
+
+  .callout-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px 6px;
+  }
+
+  .callout-icon { font-size: 0.95rem; line-height: 1; }
+
+  .callout-title {
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .callout--note    .callout-title { color: var(--accent); }
+  .callout--tip     .callout-title { color: #1d4ed8; }
+  .callout--warning .callout-title { color: #b45309; }
+  .callout--danger  .callout-title { color: #dc2626; }
+
+  .callout-body {
+    padding: 0 20px 14px;
+    font-size: 0.93rem;
+    line-height: 1.7;
+  }
+
+  .callout-body :global(p) {
+    margin: 0;
+    color: inherit;
+  }
+  .callout-body :global(p + p) {
+    margin-top: 0.6em;
+  }
+
+  .callout--note    .callout-body { color: #5a2020; }
+  .callout--tip     .callout-body { color: #1e3a5f; }
+  .callout--warning .callout-body { color: #78350f; }
+  .callout--danger  .callout-body { color: #7f1d1d; }
+</style>

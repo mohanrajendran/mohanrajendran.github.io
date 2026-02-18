@@ -8,4 +8,10 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	site: 'https://mohanrajendran.github.io',
 	integrations: [mdx(), sitemap()],
+	markdown: {
+		shikiConfig: {
+			theme: 'one-dark-pro',
+			wrap: false,
+		},
+	},
 });

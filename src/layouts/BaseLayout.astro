@@ -1,0 +1,259 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  canonicalURL?: string;
+}
+
+const {
+  title,
+  description = 'Technical writing on distributed systems, AI/ML, and software engineering by Mohan Rajendran.',
+  ogImage = '/og-default.png',
+  canonicalURL = Astro.url.href,
+} = Astro.props;
+
+const fullTitle = title === 'Mohan Rajendran'
+  ? title
+  : `${title} | Mohan Rajendran`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content={Astro.generator} />
+
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@mohanrajendran" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate" type="application/rss+xml" title="Mohan Rajendran" href="/rss.xml" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- Reading progress bar — only visible on blog posts -->
+  <div id="reading-progress" aria-hidden="true"></div>
+
+  <!-- ── Navigation ──────────────────────────────────────────────────────────── -->
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-brand" href="/">Mohan Rajendran</a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/blog">Blog</a>
+        <a href="/tags">Tags</a>
+        <a href="/about">About</a>
+      </div>
+      <!-- Mobile menu button -->
+      <button class="nav-menu-btn" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="3" y1="6" x2="17" y2="6" />
+          <line x1="3" y1="10" x2="17" y2="10" />
+          <line x1="3" y1="14" x2="17" y2="14" />
+        </svg>
+      </button>
+    </div>
+    <!-- Mobile nav drawer -->
+    <div class="nav-mobile" id="navMobile">
+      <a href="/">Home</a>
+      <a href="/blog">Blog</a>
+      <a href="/tags">Tags</a>
+      <a href="/about">About</a>
+    </div>
+  </nav>
+
+  <!-- ── Page content ────────────────────────────────────────────────────────── -->
+  <slot />
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="https://github.com/mohanrajendran" rel="noopener noreferrer" target="_blank">GitHub</a>
+        <a href="https://www.linkedin.com/in/mohan-rajendran-26421335/" rel="noopener noreferrer" target="_blank">LinkedIn</a>
+        <a href="https://x.com/mohanrajendran" rel="noopener noreferrer" target="_blank">Twitter</a>
+        <a href="/rss.xml">RSS</a>
+      </div>
+      <p class="footer-copy">© {new Date().getFullYear()} Mohan Rajendran. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
+
+<script>
+  // Reading progress bar
+  const bar = document.getElementById('reading-progress');
+  if (bar) {
+    window.addEventListener('scroll', () => {
+      const doc = document.documentElement;
+      const pct = (doc.scrollTop / (doc.scrollHeight - doc.clientHeight)) * 100;
+      bar.style.width = Math.min(pct, 100) + '%';
+    }, { passive: true });
+  }
+
+  // Mobile nav toggle
+  const btn = document.getElementById('navToggle');
+  const drawer = document.getElementById('navMobile');
+  btn?.addEventListener('click', () => {
+    const open = drawer?.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+</script>
+
+<style>
+  /* ── Reading progress ─────────────────────────────────────────────── */
+  #reading-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    width: 0%;
+    background: var(--accent);
+    z-index: 1000;
+    transition: width 80ms linear;
+    pointer-events: none;
+  }
+
+  /* ── Nav ──────────────────────────────────────────────────────────── */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    flex-shrink: 0;
+  }
+  .nav-brand:hover { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+  }
+
+  .nav-links a {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    padding: 4px;
+    line-height: 1;
+  }
+
+  /* Mobile nav drawer */
+  .nav-mobile {
+    display: none;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
+    padding: 8px 24px 16px;
+    gap: 4px;
+    background: var(--surface);
+  }
+  .nav-mobile a {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--text);
+    text-decoration: none;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-mobile a:last-child { border-bottom: none; }
+  .nav-mobile.open { display: flex; }
+
+  /* ── Footer ───────────────────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 80px;
+    padding: 32px 24px 40px;
+  }
+
+  .footer-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .footer-links a {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-links a:hover { color: var(--text); }
+
+  .footer-copy {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* ── Responsive ───────────────────────────────────────────────────── */
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .nav-menu-btn { display: block; }
+  }
+</style>
