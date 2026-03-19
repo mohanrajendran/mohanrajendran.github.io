@@ -5,17 +5,29 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import mermaid from 'astro-mermaid';
 
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://mohanrajendran.github.io',
-	integrations: [mdx(), sitemap()],
+	integrations: [
+		mdx(), 
+		sitemap(), 
+		mermaid({
+			mermaidConfig: {
+				theme: 'default',
+				themeVariables: {
+					fontFamily: "'DM Sans', sans-serif",
+				}
+			}
+		})
+	],
 	markdown: {
 		remarkPlugins: [remarkMath],
 		rehypePlugins: [rehypeKatex],
 		shikiConfig: {
-			theme: 'one-dark-pro',
-			wrap: false,
+			theme: 'dracula',
+			wrap: true,
 		},
 	},
 });
