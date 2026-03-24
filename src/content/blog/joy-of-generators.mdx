@@ -1,6 +1,6 @@
 ---
 title: "Joy of generators"
-description: "Coroutines are not just for async code. They are the natural primitive for expressing resumable state machines."
+description: "What a database join executor reveals about coroutines."
 pubDate: 2026-03-17
 tags:
   [
@@ -12,7 +12,6 @@ tags:
     "python",
     "kotlin",
     "golang",
-    "typescript"
   ]
 ---
 
@@ -20,7 +19,9 @@ I've been working through CMU 15-445[^1], Andy Pavlo's database internals course
 
 Out of curiosity, I rewrote it in Python using generators. It fit in twelve lines.
 
-This post is about what lives in that gap.
+The gap is a hand-written state machine. It exists because the C++17 used in the course cannot pause a function mid-execution and resume it later. Python can.[^5]
+
+This post covers one join algorithm (nested loop join) and one language primitive (generators). It does not cover hash joins, sort-merge joins, or async/await.
 
 ## The algorithm
 
@@ -33,7 +34,7 @@ SELECT * FROM R
 JOIN S ON R.id = S.id;
 ```
 
-In code, that's two nested loops. For every row on the left, scan every row on the right and emit pairs that match:
+For every row on the left, scan every row on the right and emit pairs that match:
 
 ```python
 def nested_loop_join(left: list[Row], right: list[Row], predicate: Callable[[Row, Row], bool]) -> list[Row]:
@@ -47,7 +48,7 @@ def nested_loop_join(left: list[Row], right: list[Row], predicate: Callable[[Row
     return result
 ```
 
-That works beautifully in isolation. The problem is trying to fit it into a real database executor.
+That works in isolation. The problem is fitting it into a real database executor.
 
 ## The Volcano model
 
@@ -77,7 +78,7 @@ flowchart TD
 
 PostgreSQL and MySQL follow this pattern closely. You can see it in PostgreSQL's [`nodeNestloop.c:61`](https://github.com/postgres/postgres/blob/master/src/backend/executor/nodeNestloop.c#L61) (`ExecNestLoop`) and MySQL's [`composite_iterators.cc:500`](https://github.com/mysql/mysql-server/blob/trunk/sql/iterators/composite_iterators.cc#L500) (`NestedLoopIterator::DoRead`). SQLite is the outlier: it compiles queries into bytecode for a register-based VM ([`vdbe.c`](https://github.com/sqlite/sqlite/blob/master/src/vdbe.c)) rather than building a tree of iterator nodes.
 
-In practice, `next()` takes a `batch_size` argument rather than returning one row at a time. Batching handles two things:
+The classic Volcano interface returns one row per call. PostgreSQL's `ExecNestLoop` and MySQL's `NestedLoopIterator::DoRead` both work this way. For this post, I use a batched variant that returns N rows at a time, because it makes the state machine problem more visible. Batching also has practical motivation:
 
 1. **Memory**: only `batch_size` rows from each side live in memory at once. Two tables with a million rows each means up to a trillion predicate evaluations if materialized upfront; batching keeps that from blowing up.
 2. **Throughput**: a tight inner loop over a contiguous buffer is cache-friendly in a way that row-at-a-time processing is not.
@@ -86,7 +87,7 @@ The contract becomes: *give me N result rows, then stop. I'll ask again when I w
 
 ## The state machine you have to write
 
-Here is where it gets messy. When `next(batch_size)` returns a full batch, both loops are mid-flight. The outer loop is on `left[i]`. The inner loop is on `right[j]`. The next call has to resume from exactly that point.
+When `next(batch_size)` returns a full batch, both loops are mid-flight. The outer loop is on `left[i]`. The inner loop is on `right[j]`. The next call has to resume from exactly that point.
 
 The simple algorithm has no concept of resumption. It runs to completion. To satisfy the batched pull interface, you have to externalize the entire loop state into the object:
 
@@ -177,37 +178,7 @@ The two nested `for` loops are gone. The algorithm is no longer visible in the c
 
 ## Generators
 
-Python generators are coroutines: functions that can pause at a `yield`, return a value to the caller, and resume from the same point on the next call with all local variables intact.
-
-A quick example before applying this to the join. Here is a subroutine that returns Fibonacci numbers:
-
-```python
-def fibonacci(num: int) -> list[int]:
-    result = []
-    a, b = 0, 1
-    while len(result) < num:
-        result.append(a)
-        a, b = b, a + b
-    return result
-
-fibonacci(10)
-# → [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
-```
-
-As a generator, the same logic becomes:
-
-```python
-def fibonacci() -> Iterator[int]:
-    a, b = 0, 1
-    while True:
-        yield a
-        a, b = b, a + b
-
-list(itertools.islice(fibonacci(), 10))
-# → [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
-```
-
-`a` and `b` are preserved across calls automatically. No external state, no index fields, no bookkeeping.
+Python generators are coroutines: functions that can pause at a `yield`, return a value to the caller, and resume from the same point on the next call with all local variables intact[^4].
 
 Applied to nested loop join:
 
@@ -261,21 +232,17 @@ The translation from the stateful class to the generator is 1:1:
 
 `right_source` must be a callable, not a bare iterator. A bare iterator exhausts on the first left row; every subsequent left row would join against nothing. The callable forces a fresh scan per outer iteration, which is exactly what `right_exec.reset()` was doing in the stateful class.
 
-## What this shows
+The stateful class from earlier is a coroutine written by hand. `left_idx`, `right_idx`, `left_buf`, `right_buf` are the suspended call frame. `next()` is resume. The `while` loop with its three zones is the dispatch table.
 
-The stateful class is a coroutine written by hand. `left_idx`, `right_idx`, `left_buf`, `right_buf` are the suspended call frame. `next()` is resume. The `while` loop with its three zones is the dispatch table.
+Coroutines are almost always pitched as a concurrency concept. At their core, they are functions that can be paused and resumed without losing local state. Concurrency is one use. Incremental computation over data is another, and it is the one that matters here.
 
-Coroutines are almost always pitched as a concurrency concept: suspend execution, go do other work, and resume when the network I/O finishes. But that's only half the story. At its core, a coroutine is a function that can be paused and resumed without losing its local state. Concurrency is one application. Incremental computation over data is another.
-
-Any algorithm that is inherently a loop but needs to yield results incrementally is a coroutine. Nested loop join is one example. The merge step in merge sort is another. Tree traversal with an external iterator is another.
-
-When you find yourself adding `idx` and `buf` fields to a class so a method can resume mid-computation, you are writing a coroutine by hand. Python's `yield` does not just make it shorter. It lets the code say what the algorithm does, rather than how to resume it.
+Any algorithm that is inherently a loop but needs to yield results incrementally is a coroutine. Nested loop join is one example. The merge step in merge sort is another. Tree traversal with an external iterator is another. When you find yourself adding `idx` and `buf` fields to a class so a method can resume mid-computation, you are writing a coroutine by hand.
 
 ## The same idea in other languages
 
-Python is not unique here. Most modern languages have some form of this, though they differ in what the runtime actually does with it.
+The suspension mechanism differs across languages. Python suspends the generator frame on the heap. Kotlin's compiler transforms coroutines into state machine classes via CPS transform. Go 1.23 added runtime coroutine support for function iterators[^3]. TypeScript has `function*` with the same semantics as Python.
 
-**Kotlin** has `sequence { }`, a coroutine builder for lazy sequences:
+**Kotlin**'s `sequence { }` is a coroutine builder for lazy sequences. The Kotlin compiler applies a CPS (continuation-passing style) transform, then flattens the nested continuations into a single state machine class with a label field for dispatch and stack variables stored on the heap.
 
 ```kotlin
 fun nestedLoopJoin(
@@ -293,29 +260,7 @@ fun nestedLoopJoin(
 }
 ```
 
-The structure matches the Python version. The difference is under the hood: the Kotlin compiler transforms this into a state machine class which stores stack variables in the heap along with a `resumeWith` dispatch method.
-
-**TypeScript** has generator functions (`function*`) with `yield`, same semantics as Python:
-
-```typescript
-type Row = readonly unknown[];
-
-function* nestedLoopJoin(
-    left: Iterable<Row>,
-    rightSource: () => Iterable<Row>,
-    predicate: (left: Row, right: Row) => boolean
-): Generator<Row> {
-    for (const leftRow of left) {
-        for (const rightRow of rightSource()) {
-            if (predicate(leftRow, rightRow)) {
-                yield [...leftRow, ...rightRow];
-            }
-        }
-    }
-}
-```
-
-**Go** traditionally solved this by coupling a goroutine with a channel, but as of Go 1.23, it has standard function iterators[^3] that act like generators:
+**Go** is the more interesting case. The `iter.Seq` API is callback-shaped: instead of `yield` being a keyword, the caller passes a `yield` function that the iterator invokes. If the consumer is done, `yield` returns `false`. But the implementation is not purely callback-based. Go 1.23 added coroutine support to the runtime (`runtime.newcoro` / `coroswitch`), which performs actual goroutine stack switching when the iterator yields. The API hides the suspension; the runtime still does it.
 
 ```go
 import "iter"
@@ -335,16 +280,18 @@ func nestedLoopJoin(left iter.Seq[Row], rightSource func() iter.Seq[Row], predic
 }
 ```
 
-The core pattern stays the same: write the algorithm as a loop, suspend with `yield`, and let the runtime remember where you are. The languages differ in how they implement the suspension (state machines in Python, Kotlin, and JS; goroutine-based in Go) and how much the compiler does for you.
-
 ## Limitations
 
-Generators fit the row-at-a-time Volcano model well. Columnar engines like DuckDB and Apache Arrow DataFusion process data in column-oriented batches and bypass per-row iteration for throughput reasons. In those systems the state management is real, but it lives at the compiled query level rather than in interpreter-visible objects.
+I have not benchmarked the generator version against the stateful class. In Python, generator frame suspension has real overhead per yield. For a join executor doing millions of predicate evaluations, that overhead is measurable. Whether it matters depends on whether the bottleneck is the join logic or the I/O underneath it.
 
-Production databases like PostgreSQL and MySQL also aren't going to rewrite their executors to use generators any time soon. The hand-written state machine in `nodeNestloop.c` has been tested, profiled, and debugged over decades. You could theoretically swap it out for a generator and get the same behavior, but regressions in a database executor are painful to debug. The existing code probably handles a dozen obscure edge cases that nobody documented. Battle-tested code usually wins out.
+Generators fit the row-at-a-time Volcano model well. Columnar engines like DuckDB and Apache Arrow DataFusion process data in column-oriented batches and bypass per-row iteration entirely for throughput reasons. In those systems the state management is real, but it lives at the compiled query level rather than in interpreter-visible objects.
 
-For writing new query engines or any iterator model, however, generators are entirely the right way to do it.
+Production databases like PostgreSQL and MySQL are not going to rewrite their executors to use generators. The hand-written state machine in `nodeNestloop.c` has been tested, profiled, and debugged over decades. It probably handles a dozen obscure edge cases that nobody documented. Battle-tested code wins.
+
+When a language can suspend and resume a function, the algorithm stays visible in the code. When it cannot, you bury the algorithm in bookkeeping. That is the real cost of missing coroutine support: not performance, but legibility.
 
 [^1]: [CMU 15-445: Database Systems, Fall 2025](https://15445.courses.cs.cmu.edu/fall2025/)
 [^2]: Graefe, G. (1994). *Volcano: An Extensible and Parallel Query Evaluation System*. IEEE Transactions on Knowledge and Data Engineering, 6(1), 120-135. https://cs-people.bu.edu/mathan/reading-groups/papers-classics/volcano.pdf
 [^3]: Go 1.23 release notes: [Range over function iterators](https://go.dev/blog/range-functions)
+[^4]: A minimal example: a Fibonacci subroutine `def fibonacci(n)` that builds a list and returns it becomes `def fibonacci()` with `yield a` inside a `while True` loop. `a` and `b` are preserved across calls automatically. No external state, no index fields, no bookkeeping.
+[^5]: C++20 added coroutines with `co_yield` and `co_await`. C++23 added `std::generator`. BusTub uses C++17, which predates both.

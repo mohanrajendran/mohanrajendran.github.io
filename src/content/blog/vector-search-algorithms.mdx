@@ -1,6 +1,6 @@
 ---
 title: "Vector Search Algorithms from scratch"
-description: "Billion vectors, millisecond queries. How IVF and HNSW make the impossible fast, built from scratch."
+description: "Building IVF and HNSW from scratch to understand the accuracy/speed trade-off in vector search."
 pubDate: 2026-02-28
 tags:
   [
@@ -14,51 +14,27 @@ tags:
 
 Exact nearest-neighbor search is essentially impossible at scale. A billion 1024-dimensional vectors means a trillion floating-point operations per query, and you need an answer in milliseconds. Every production vector database makes the same trade-off: give up the guarantee of finding the _exact_ match in exchange for finding an _excellent_ match, fast.
 
-Databases like [OpenSearch](https://opensearch.org/platform/search/vector-database.html), [Pinecone](https://www.pinecone.io/), and [QDrant](https://qdrant.tech/) handle this using specialized algorithms like IVF and HNSW. This post builds those algorithms from scratch, starting from why brute force fails, through the curse of dimensionality, to production-grade indexing. Familiarity with [vector embeddings](https://www.pinecone.io/learn/vector-embeddings/) is assumed.
+Databases like [OpenSearch](https://opensearch.org/platform/search/vector-database.html), [Pinecone](https://www.pinecone.io/), and [QDrant](https://qdrant.tech/) handle this using specialized algorithms like IVF and HNSW. This post builds both from scratch to understand the accuracy/speed trade-off. It does not cover product quantization, ScaNN, or DiskANN. Familiarity with [vector embeddings](https://www.pinecone.io/learn/vector-embeddings/) is assumed.
 
-## Vector search
+## Measuring closeness
 
-Once you have embedded your corpus of input documents, the core problem of _vector search_ reveals itself. Given a search query, what are the input documents that are closest in meaning to the query? This is determined by finding the documents whose embeddings are closest to your query's embedding.
+Given a search query, vector search finds the documents whose embeddings are closest to the query's embedding. "Closest" requires a distance function. Two are standard:
 
-Now there are many different definitions on what _closeness_ means. Two major methods are used for calculating closeness between two vectors $a$ and $b$.
-- Euclidean distance - This is a measure of how far the two vectors are from each other. Defined as $Distance(a,b) = \sqrt{(a_1 - b_1)^2 + ... + (a_n - b_n)^2}$
-- Dot product - This is a measure of the angle between two vectors multiplied by their length. Defined as $a.b = a_1 b_1 + ... + a_n b_n = \Vert{a}\Vert \Vert b\Vert cos(\theta)$
+- **Euclidean distance** measures how far apart two vectors are in space: $d(a,b) = \sqrt{(a_1 - b_1)^2 + \cdots + (a_n - b_n)^2}$
+- **Dot product** measures the angle between two vectors scaled by their magnitudes: $a \cdot b = a_1 b_1 + \cdots + a_n b_n = \lVert a \rVert \lVert b \rVert \cos(\theta)$
+
 <div style="display: flex; gap: 2rem; justify-content: center; align-items: center; margin: 1rem 0;">
   <img src="/images/vector_search_algorithms/vector-distance.svg" alt="Vector distance" style="width: 45%; max-width: 300px;" />
   <img src="/images/vector_search_algorithms/dot-product.svg" alt="Dot product" style="width: 45%; max-width: 300px;" />
 </div>
 
-Or in code, given two vectors `a` and `b` represented as a list of numbers. 
-```python
-def euclidean_distance(aVec: list[float], bVec: list[float]) -> float:
-    return math.sqrt(sum((a-b)*(a-b) for a, b in zip(aVec, bVec)))
+Euclidean distance is the default in most vector databases and the metric used throughout this post. Dot product (or its normalized form, cosine similarity) is preferred when vector magnitudes are meaningful, such as in recommendation systems where a larger magnitude signals stronger preference.
 
-def dot_product(aVec: list[float], bVec: list[float]) -> float:
-    return sum(a * b for a,b in zip(aVec, bVec))
-```
-
-Or for higher performance, `numpy` is preferred:
-```python
-def euclidean_distance(aVec: np.ndarray, bVec: np.ndarray) -> float:
-    return np.linalg.norm(aVec - bVec)
-
-def dot_product(aVec: np.ndarray, bVec: np.ndarray) -> float:
-    return np.dot(aVec, bVec)
-```
-
-Regardless of the distance measure, `k` nearest neighbor (kNN) search aims to do the following: given a bag of vectors and a query, find the `k` vectors that are closest to the query. Formally:
-
-Given a corpus of vectors, $\mathcal{X} = \{x_1, \ldots, x_N\}$ and a query vector $q$, find the $k$ vectors closest to $q$:
-
-$$
-\text{kNN}(q, k) = \underset{S \subseteq \mathcal{X},\; |S|=k}{\arg\min} \sum_{x \in S} d(q,\, x)
-$$
-
-In plain English: pick the subset $S$ of exactly $k$ vectors whose total distance to the query is the smallest possible. The rest of this post is about making that selection fast.
+Given a corpus of $N$ vectors and a query vector $q$, **k-nearest-neighbor (kNN) search** finds the $k$ vectors closest to $q$. The rest of this post is about making that selection fast.
 
 ## Naive approach: The Linear Scan
 
-The easiest method to implement the `k` nearest neighbor search is simply a linear scan. We calculate the distance from the query vector to all corpus vectors, order and pick the `k` corpus vectors with the smallest distance to the query. We can even use `numpy` to speed up distance calculation in a single function call instead of looping through all the points. For simplicity, we will use euclidean distance going forward.
+The simplest kNN implementation is a linear scan: compute the distance from the query to every vector in the corpus, then return the $k$ smallest.
 
 We call this a **Flat Index**.
 
@@ -85,7 +61,7 @@ class FlatIndex:
 
 This works for small datasets. The problem is that it's a **brute-force scan**.
 
-If we have $N$ vectors of dimension $D$, every search takes $O(N \cdot D)$ time. At 1 million vectors and 128 dimensions, we're doing 128 million multiplications for **every single query**. For some use cases, it is common to have in the order of billion vectors indexed with 1024 dimensions.
+If we have $N$ vectors of dimension $D$, every search takes $O(N \cdot D)$ time. At 1 million vectors and 128 dimensions, that is 128 million multiplications per query. Production indexes routinely hold a billion vectors at 1024 dimensions.
 
 Running a simple benchmark on a consumer laptop shows almost 1.2s per query at 1 million vectors and 128 dimensions.
 
@@ -102,7 +78,7 @@ n=1,000,000  1258.07 ms/query
 
 ![](/images/vector_search_algorithms/flat_scaling.png)
 
-To overcome this problem, we need to prune our search down to only the vectors that are likely to be close to our query vector. 
+To do better, we need to prune the search to only vectors likely to be close to the query.
 
 ## Aside: Curse of dimensionality
 
@@ -133,7 +109,7 @@ A smarter approach, the [Kd-tree](https://en.wikipedia.org/wiki/K-d_tree), split
 
 ## Scaling with IVF (Inverted File Index)
 
-IVF sidesteps the curse of dimensionality by learning the partitions from data. [K-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) finds centroids that summarise the natural groupings in the corpus. Unlike axis-aligned splits, these clusters are able to naturally group vectors in high dimensions.
+IVF sidesteps the curse of dimensionality by learning the partitions from data. [K-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) finds centroids that summarise the natural groupings in the corpus. Unlike axis-aligned splits, these clusters naturally group vectors in high dimensions.
 
 Building the index is two steps:
 
@@ -216,7 +192,7 @@ Note that $v2=[4,3]$ is geometrically close to cluster C, but k-means assigned i
 At query time, we compute the distance from $q$ to each centroid:
 
 ```
-  dist(q, A) = √((5-2.3)² + (4-2.0)²) = 3.33
+  dist(q, A) = √((5-2.3)² + (4-2.0)²) = 3.36
   dist(q, B) = √((5-8.5)² + (4-8.5)²) = 5.70
   dist(q, C) = √((5-5.5)² + (4-1.5)²) = 2.55   ← nearest
 ```
@@ -247,7 +223,7 @@ Benchmarking IVF against the flat index on 128-dimensional clustered data (using
 
 ![IVF vs Flat latency scaling](/images/vector_search_algorithms/ivf_latency_scaling.png)
 
-At 100k vectors, IVF is 15x faster. The gap widens with scale: the time taken for flat index grows linearly while IVF only scans a fixed fraction of the data. But speed alone doesn't matter if you're returning the wrong results. Using different values `nprobe` on the 100k index reveals the trade-off:
+At 100k vectors, IVF is 15x faster. The gap widens with scale: the time taken for flat index grows linearly while IVF only scans a fixed fraction of the data. But speed alone does not matter if you are returning the wrong results. Sweeping `nprobe` on the 100k index reveals the trade-off:
 
 ```
   nprobe=  1 (  0.3%) | Recall=0.588 | 2.37 ms
@@ -263,7 +239,7 @@ Recall climbs steeply at first (probing just 1.3% of clusters already hits 98.6%
 
 ## HNSW
 
-**Hierarchical Navigable Small World (HNSW)** is the gold standard for vector indexing, requiring no pre-training and no centroid count to tune. The implementation follows the [original paper](https://arxiv.org/pdf/1603.09320).
+**Hierarchical Navigable Small World (HNSW)** requires no pre-training and no centroid count to tune. The implementation follows the [original paper](https://arxiv.org/pdf/1603.09320).
 
 ![HNSW Hierarchy](/images/vector_search_algorithms/hnsw-hierarchy.png)
 
@@ -271,7 +247,7 @@ The name describes the structure:
 
 - **Small World**: every node connects to its `M` nearest neighbors, forming a graph where any two nodes are reachable in $O(\log N)$ hops, a property of [navigable small-world networks](https://en.wikipedia.org/wiki/Small-world_network). Higher `M` means a better-connected graph (better recall, more memory).
 - **Navigable**: search is a greedy walk: at each hop, move to the neighbor closest to the query. The `ef` parameter controls how many candidates to track during this walk: `ef=1` is pure greedy, while higher `ef` explores more paths for better accuracy.
-- **Hierarchy**: multiple layers stacked on the small world graph: sparse at the top for fast coarse navigation, and dense at the bottom for precision. Each node appears at a random layer drawn from an exponential distribution — most nodes only exist at layer 0, a few reach higher layers.
+- **Hierarchy**: multiple layers stacked on the small world graph: sparse at the top for fast coarse navigation, and dense at the bottom for precision. Each node appears at a random layer drawn from an exponential distribution; most nodes only exist at layer 0, a few reach higher layers.
 
 If you've seen a [skip list](https://en.wikipedia.org/wiki/Skip_list), this is the same idea generalised to vectors: express lanes at the top let you take long hops toward the target, then you drop to denser layers for precision. The difference is that a skip list's "closeness" is a 1D key comparison; HNSW's is a vector distance.
 
@@ -280,7 +256,7 @@ If you've seen a [skip list](https://en.wikipedia.org/wiki/Skip_list), this is t
   <small>Image source: <a href="https://commons.wikimedia.org/wiki/File:Skip_list.svg">Wikipedia</a></small>
 </div>
 
-Search enters at the top layer, greedily descends toward the query, then repeats on each denser layer until layer 0. To power the index, we'll build a low-level primitive that helps build both indexing and search phase. This is [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra's_algorithm) at its core, greedily expanding the closest unvisited node, with one difference: we skip exploring any neighbor that can't improve on our current `ef` best results. This bounds the search to a local neighborhood rather than the full graph.
+Search enters at the top layer, greedily descends toward the query, then repeats on each denser layer until layer 0. The core primitive is a [greedy best-first search](https://en.wikipedia.org/wiki/Best-first_search) with a bounded candidate set: expand the closest unvisited node, but skip any neighbor that cannot improve on the current `ef` best results. With `ef=1` this is pure greedy search; with `ef>1` it becomes a beam search that tracks multiple promising paths. This bounds exploration to a local neighborhood rather than the full graph.
 
 ```python
 def _search_layer(self, query: np.ndarray, entry_ids: list[int], ef: int, layer: int) -> list:
@@ -290,7 +266,7 @@ def _search_layer(self, query: np.ndarray, entry_ids: list[int], ef: int, layer:
         dist = np.linalg.norm(query - self._nodes[node_id].vector)
         heapq.heappush(candidates, (dist, node_id))
 
-    best = []    # max-heap: (dist, id): worst of current top-ef results at front
+    best = []    # max-heap (Python 3.14+): worst of current top-ef results at front
     visited = set()
 
     while candidates:
@@ -382,7 +358,7 @@ class HNSWIndex:
 
 ### HNSW in action: a worked example
 
-Consider 8 vectors in 2D: $v0=[1,2]$, $v1=[2,1]$, $v2=[1.5,1.5]$, $v3=[8,9]$, $v4=[9,8]$, $v5=[8.5,8.5]$, $v6=[5,1]$, $v7=[6,2]$. Suppose the graph has been built with `M=2`:
+Same 8 vectors as before: $v0=[1,2]$, $v1=[2,1]$, $v2=[4,3]$, $v3=[8,9]$, $v4=[9,8]$, $v5=[8.5,8.5]$, $v6=[5,1]$, $v7=[6,2]$. Suppose the graph has been built with `M=2`:
 
 ```
 Layer 1 (sparse):    v3 ——— v0
@@ -394,13 +370,13 @@ Layer 0 (dense):     v0 — v1 — v2
                              v4—v5
 ```
 
-To search for $q = [5.0, 5.0]$ with `k=1`:
+To search for $q = [5, 4]$ with `k=1`:
 
-**Phase 1: Layer 1 (ef=1):** Start at entry point $v3=[8,9]$ (dist=5.0). Its only layer-1 neighbor is $v0=[1,2]$ (dist=5.0), which is no closer. $v3$ stays as entry. Descend to layer 0.
+**Phase 1: Layer 1 (ef=1):** Start at entry point $v3=[8,9]$ (dist=5.83). Its only layer-1 neighbor is $v0=[1,2]$ (dist=4.47). $v0$ is closer, so it becomes the entry. Descend to layer 0.
 
-**Phase 2: Layer 0 (ef=ef\_search):** Start at $v3$ (dist=5.0). Expand its neighbors: $v2=[1.5,1.5]$ (dist=4.95), $v5=[8.5,8.5]$ (dist=4.95). Both closer. Expanding further through the graph reaches $v6=[5,1]$ (dist=4.0), then $v7=[6,2]$ (dist=3.16). No further improvement. Return $v7$.
+**Phase 2: Layer 0 (ef=ef\_search):** Start at $v0$ (dist=4.47). Expand its neighbors: $v1$ (4.24), $v6$ (3.0). Pop closest candidate $v6$, expand: $v7$ (2.24). Pop $v7$, expand: $v4$ (5.66, no improvement). Pop $v1$, expand: $v2$ (1.41). $v2$ is now the closest candidate. Expand $v2$: $v3$ (5.83, no improvement). No candidates left that can beat 1.41. Return $v2$.
 
-The true nearest neighbor is $v7$ at distance 3.16. HNSW found it by visiting 6 of 8 nodes. In this toy graph that's most of them, but the structure scales logarithmically: at a million vectors with `M=16`, a search typically visits a few hundred nodes.
+HNSW found the exact nearest neighbor by visiting most of the 8 nodes. In a toy graph that is expected, but the structure scales logarithmically: at a million vectors with `M=16`, a search typically visits a few hundred nodes.
 
 ### Tuning HNSW parameters
 
@@ -458,10 +434,4 @@ In practice, HNSW typically achieves 95%+ recall while searching less than 1% of
 
 ## Conclusion
 
-Each algorithm occupies a different point in the accuracy/speed/memory space:
-
-- **Flat Index**: exact results, no parameters to tune, $O(N \cdot D)$ per query. Use it for $N < 10{,}000$ or as ground truth to validate approximate indexes.
-- **IVF**: requires a k-means training step, but uses no extra memory beyond the centroids. Tune `nlist` and `nprobe` to control the accuracy/speed curve. Fits when memory is constrained and you can afford offline training.
-- **HNSW**: no training step, $O(\log N)$ queries, 95%+ recall out of the box. The graph edges add $O(N \cdot M)$ memory on top of the vectors. The default choice when latency matters.
-
-These algorithms are building blocks, not final answers. Production systems combine them: IVF for coarse filtering with product quantization for compression, or HNSW with metadata pre-filtering. The ANN Benchmarks project ([ann-benchmarks.com](http://ann-benchmarks.com)) tracks how these combinations perform across real datasets.
+These algorithms are building blocks, not final answers. Production systems layer them: IVF with product quantization for compression, HNSW with metadata pre-filtering, or hybrid approaches that use IVF to coarsely shard the graph. The [ANN Benchmarks](http://ann-benchmarks.com) project tracks how these combinations perform across real datasets, and it is the best place to start when choosing an index for a specific workload.
